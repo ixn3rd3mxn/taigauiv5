@@ -41,10 +41,10 @@
         </button>
         <span tuiNavigationLogo>
             <tui-icon icon="@tui.home" />
-            <span tuiFade>A very very long product name</span>
-            <div tuiBadge>Test</div>
+            <span tuiFade>ศูนย์รับแจ้งเหตุฯ ปัตตานี</span>
+            <!-- <div tuiBadge>pre-alpha-1.1.1</div> -->
         </span>
-        <span tuiNavigationSegments>
+        <!-- <span tuiNavigationSegments>
             <button
                 appearance="secondary-grayscale"
                 tuiButton
@@ -95,9 +95,13 @@
                     </tui-data-list>
                 </ng-template>
             </button>
-        </span>
+        </span> -->
         <hr />
-        <button
+        <span tuiNavigationLogo>
+            <span tuiFade>วันเวลาปัจจุบัน {{ timeString() }} {{ shift() }} {{ dateString() }}</span>
+            <!-- <div tuiBadge>pre-alpha-1.1.1</div> -->
+        </span>
+        <!-- <button
             appearance="secondary-grayscale"
             iconStart="@tui.plus"
             tuiButton
@@ -120,12 +124,13 @@
         >
             More
         </button>
-        <div tuiAvatar="AI"></div>
+        <div tuiAvatar="AI"></div> -->
     </header>
     <div [style.display]="'flex'">
-        <aside [tuiNavigationAside]="expanded()"
+    <aside
+        [tuiNavigationAside]="expanded()"
           [style.height]="'calc(100vh - 3rem)'"
-        >
+    >
             <header>
                 <button
                     iconStart="@tui.home"
@@ -134,7 +139,7 @@
                 >
                     <ng-container [ngTemplateOutlet]="hint" />
                     <ng-template #hint>
-                        <span tuiFade>A very very long product name</span>
+                        <span tuiFade>หน้าหลัก</span>
                         <div
                             appearance="accent"
                             tuiBadge
@@ -144,28 +149,72 @@
                     </ng-template>
                 </button>
             </header>
-            <button
-                iconStart="@tui.search"
-                tuiAsideItem
-                type="button"
-            >
-                Search
-
-                @if (expanded()) {
-                    <div
-                        appearance="accent"
-                        tuiBadge
-                    >
-                        12
-                    </div>
-                }
-            </button>
+            <tui-aside-group>
+                <button
+                    iconStart="@tui.layout-dashboard"
+                    tuiAsideItem
+                    tuiChevron
+                    type="button"
+                >
+                    รายงานรับแจ้งเหตุ
+                    <ng-template>
+                        <button
+                            tuiAsideItem
+                            type="button"
+                        >
+                            แดชบอร์ด
+                        </button>
+                        <button
+                            tuiAsideItem
+                            type="button"
+                        >
+                            สรุปผล
+                        </button>
+                        <button
+                            tuiAsideItem
+                            type="button"
+                        >
+                            จัดการข้อมูล
+                        </button>
+                    </ng-template>
+                </button>
+            </tui-aside-group>
+            <tui-aside-group>
+                <button
+                    iconStart="@tui.map"
+                    tuiAsideItem
+                    tuiChevron
+                    type="button"
+                >
+                    รวมหน่วยกู้ชีพ
+                    <ng-template>
+                        <button
+                            tuiAsideItem
+                            type="button"
+                        >
+                            แผนที่
+                        </button>
+                        <button
+                            tuiAsideItem
+                            type="button"
+                        >
+                            สรุปผล
+                        </button>
+                        <button
+                            tuiAsideItem
+                            type="button"
+                        >
+                            จัดการข้อมูล
+                        </button>
+                    </ng-template>
+                </button>
+            </tui-aside-group>
             <a
                 iconStart="@tui.users"
                 tuiAsideItem
-                [routerLink]="routes.Navigation"
+                routerLink="/"
             >
-                Groups
+                เทส
             </a>
             <tui-aside-group>
                 <button
@@ -174,25 +223,13 @@
                     tuiChevron
                     type="button"
                 >
-                    Settings
+                    เทส
                     <ng-template>
                         <button
                             tuiAsideItem
                             type="button"
                         >
-                            Account
-                        </button>
-                        <button
-                            tuiAsideItem
-                            type="button"
-                        >
-                            Notifications
-                        </button>
-                        <button
-                            tuiAsideItem
-                            type="button"
-                        >
-                            Privacy
+                            เทส
                         </button>
                     </ng-template>
                 </button>
@@ -202,7 +239,22 @@
                 tuiAsideItem
                 type="button"
             >
-                <span tuiFade>By default ellipsis is used but you can use fade too</span>
+                <span tuiFade>เทส</span>
+            </button>
+            <button
+                iconStart="@tui.search"
+                tuiAsideItem
+                type="button"
+            >
+                เทส
+                @if (expanded()) {
+                    <div
+                        appearance="accent"
+                        tuiBadge
+                    >
+                        12
+                    </div>
+                }
             </button>
             <button
                 iconEnd="@tui.chevron-right"
@@ -213,7 +265,7 @@
                 type="button"
                 [tuiDropdown]="more"
             >
-                More
+                เทส
                 <ng-template
                     #more
                     let-close
@@ -224,7 +276,7 @@
                             tuiAsideItem
                             type="button"
                         >
-                            Write
+                            เทส
                         </button>
                         <button
                             iconStart="@tui.pie-chart"
@@ -232,7 +284,7 @@
                             type="button"
                             [tuiDropdown]="submenu"
                         >
-                            Categories
+                            เทส
                             <ng-template #submenu>
                                 <tui-data-list>
                                     <button
@@ -240,19 +292,13 @@
                                         type="button"
                                         (click)="close()"
                                     >
-                                        Fiction (will close menu)
+                                        เทส
                                     </button>
                                     <button
                                         tuiAsideItem
                                         type="button"
                                     >
-                                        Non-Fiction
-                                    </button>
-                                    <button
-                                        tuiAsideItem
-                                        type="button"
-                                    >
-                                        Children
+                                        เทส
                                     </button>
                                 </tui-data-list>
                             </ng-template>
@@ -266,7 +312,7 @@
                 tuiAsideItem
                 type="button"
             >
-                Add
+                เทส
             </button>
             <footer>
                 <button
@@ -274,15 +320,15 @@
                     tuiAsideItem
                     type="button"
                 >
-                    Favorites
+                    เทส
                 </button>
                 <button
                     tuiAsideItem
                     type="button"
-                    [iconStart]="expanded() ? '@tui.chevron-left' : '@tui.chevron-right'"
+                    [iconStart]="expanded() ? '@tui.arrow-left-to-line' : '@tui.arrow-right-to-line'"
                     (click)="handleToggle()"
                 >
-                    {{ expanded() ? 'Collapse' : 'Expand' }}
+                    {{ expanded() ? 'ซ่อนแถบ' : 'แสดงแถบ' }}
                 </button>
             </footer>
         </aside>
