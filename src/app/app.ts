@@ -21,6 +21,8 @@ import {
     TuiTitle,
     TuiInput,
     TuiLink,
+    TUI_MONTHS,
+    TUI_SHORT_WEEK_DAYS,
 } from '@taiga-ui/core';
 import {
     TuiBadge,
@@ -89,6 +91,22 @@ function getShift(date: Date): string {
     templateUrl: './app.html',
     styleUrl: './app.less',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    providers: [
+        {
+            provide: TUI_MONTHS,
+            useValue: signal([
+                'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน',
+                'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม',
+                'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม',
+            ] as const),
+        },
+        {
+            provide: TUI_SHORT_WEEK_DAYS,
+            useValue: signal([
+                'จ.', 'อ.', 'พ.', 'พฤ.', 'ศ.', 'ส.', 'อา.',
+            ] as const),
+        },
+    ],
 })
 export class App implements OnDestroy {
     private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
