@@ -40,8 +40,8 @@
             </tui-data-list>
         </button>
         <span tuiNavigationLogo>
-            <tui-icon icon="@tui.home" />
-            <span tuiFade>ศูนย์รับแจ้งเหตุฯ ปัตตานี</span>
+            <!-- <tui-icon icon="@tui.home" /> -->
+            <span tuiFade>ศูนย์รับแจ้งเหตุและสั่งการการแพทย์ฉุกเฉิน อบจ.ปัตตานี</span>
             <!-- <div tuiBadge>pre-alpha-1.1.1</div> -->
         </span>
         <!-- <span tuiNavigationSegments>
@@ -431,55 +431,11 @@
                     บันทึกเหตุ
                 </button>
             </nav>
+
             <ng-container>
-                @for (_ of '-'.repeat(10); track $index) {
-                    <form
-                        appearance="floating"
-                        tuiCardLarge
-                        tuiForm="m"
-                        [style.grid-column]="'2 / span 7'"
-                    >
-                        <header tuiHeader>
-                            <h2 tuiTitle>
-                                Registration form
-                                <span tuiSubtitle>Tell us about yourself</span>
-                            </h2>
-                        </header>
-                        <tui-textfield>
-                            <label tuiLabel>Name</label>
-                            <input
-                                placeholder="John Wick"
-                                tuiInput
-                            />
-                        </tui-textfield>
-                        <footer>
-                            <button
-                                appearance="secondary"
-                                tuiButton
-                                type="button"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                tuiButton
-                                type="submit"
-                            >
-                                Ok
-                            </button>
-                        </footer>
-                    </form>
-                    <div
-                        appearance="outline-grayscale"
-                        tuiCardLarge
-                        [style.grid-column]="'span 3'"
-                    >
-                        <h2 tuiTitle>
-                            Sidebar content
-                            <span tuiSubtitle>Use CSS grid to position</span>
-                        </h2>
-                    </div>
-                }
+            xxx
             </ng-container>
+
         </main>
     </div>
 </tui-root>
