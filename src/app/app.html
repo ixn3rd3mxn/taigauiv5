@@ -338,7 +338,7 @@
                 tuiSubheader
                 [style.position]="'sticky'"
             >
-                <tui-breadcrumbs [itemsLimit]="10">
+                <!-- <tui-breadcrumbs [itemsLimit]="10">
                     @for (item of breadcrumbs; track item) {
                         @if ($last) {
                             <strong
@@ -358,8 +358,37 @@
                             </button>
                         }
                     }
-                </tui-breadcrumbs>
-                <tui-tabs tuiFade>
+                </tui-breadcrumbs> -->
+                
+                <tui-textfield
+                    [style.width.rem]="7.04"
+                    [tuiTextfieldCleaner]="false"
+                >
+                    <input
+                        tuiInputDate
+                        [max]="dateMax"
+                        [min]="dateMin"
+                        [(ngModel)]="dateValue"
+                        (keydown)="$event.preventDefault()"
+                    />
+                    <tui-calendar *tuiDropdown />
+                </tui-textfield>
+                
+                <tui-textfield tuiChevron
+                    [style.width.rem]="4.22"
+                    [tuiTextfieldCleaner]="false"
+                >
+                    <input
+                        tuiSelect
+                        [(ngModel)]="selectedShift"
+                    />
+                    <tui-data-list-wrapper
+                        *tuiDropdown
+                        [items]="shifts"
+                    />
+                </tui-textfield>
+
+                <!-- <tui-tabs tuiFade>
                     <button
                         tuiTab
                         type="button"
@@ -378,19 +407,27 @@
                     >
                         Followers
                     </button>
-                </tui-tabs>
+                </tui-tabs> -->
+                
                 <button
-                    appearance="secondary"
+                    tuiButton
+                    type="button"
+                    (click)="resetToToday()"
+                >
+                    วันนี้
+                </button>
+                <button
+                    appearance="primary"
                     tuiButton
                     type="button"
                 >
-                    Secondary
+                    กำหนดเจ้าหน้าที่
                 </button>
                 <button
                     tuiButton
                     type="button"
                 >
-                    Primary
+                    บันทึกเหตุ
                 </button>
             </nav>
             <ng-container>

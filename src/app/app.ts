@@ -10,24 +10,29 @@ import {
 } from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {RouterLink} from '@angular/router';
+import {TuiDay} from '@taiga-ui/cdk';
 import {
     TuiButton,
     TuiDataList,
     TuiDropdown,
     TuiIcon,
+    TuiRoot,
+    TuiTextfield,
+    TuiTitle,
     TuiInput,
     TuiLink,
-    TuiRoot,
-    TuiTitle,
 } from '@taiga-ui/core';
 import {
     TuiBadge,
-    TuiBreadcrumbs,
     TuiChevron,
     TuiDataListDropdownManager,
+    TuiDataListWrapper,
     TuiFade,
+    TuiInputDate,
+    TuiSelect,
     TuiSwitch,
     TuiTabs,
+    TuiBreadcrumbs,
 } from '@taiga-ui/kit';
 import {TuiCardLarge, TuiForm, TuiHeader, TuiNavigation} from '@taiga-ui/layout';
 
@@ -45,9 +50,9 @@ function getShift(date: Date): string {
     const h = date.getHours();
     const m = date.getMinutes();
     const total = h * 60 + m;
-    if (total >= 8 * 60 + 30 && total < 16 * 60 + 30) return 'เวรเช้า';
-    if (total >= 16 * 60 + 30 || total < 30) return 'เวรบ่าย';
-    return 'เวรดึก';
+    if (total >= 8 * 60 + 30 && total < 16 * 60 + 30) return 'เช้า';
+    if (total >= 16 * 60 + 30 || total < 30) return 'บ่าย';
+    return 'ดึก';
 }
 
 @Component({
@@ -58,24 +63,28 @@ function getShift(date: Date): string {
         NgTemplateOutlet,
         RouterLink,
         TuiBadge,
-        TuiBreadcrumbs,
         TuiButton,
         TuiCardLarge,
         TuiChevron,
         TuiDataList,
         TuiDataListDropdownManager,
+        TuiDataListWrapper,
         TuiDropdown,
         TuiFade,
         TuiForm,
         TuiHeader,
         TuiIcon,
-        TuiInput,
-        TuiLink,
+        TuiInputDate,
         TuiNavigation,
         TuiRoot,
+        TuiSelect,
         TuiSwitch,
         TuiTabs,
+        TuiTextfield,
         TuiTitle,
+        TuiBreadcrumbs,
+        TuiInput,
+        TuiLink,
     ],
     templateUrl: './app.html',
     styleUrl: './app.less',
@@ -99,7 +108,7 @@ export class App implements OnDestroy {
         return `วัน${day}ที่ ${date} ${month} ${year}`;
     });
 
-    protected readonly shift = computed(() => getShift(this.now()));
+    protected readonly shift = computed(() => `เวร${getShift(this.now())}`);
 
     constructor() {
         if (this.isBrowser) {
@@ -110,6 +119,12 @@ export class App implements OnDestroy {
     ngOnDestroy(): void {
         if (this.intervalId !== null) clearInterval(this.intervalId);
     }
+
+    protected readonly dateMin = new TuiDay(2026, 2, 16);
+    protected readonly dateMax = new TuiDay(2031, 11, 31);
+    protected dateValue = TuiDay.currentLocal();
+    protected readonly shifts = ['เช้า', 'บ่าย', 'ดึก'];
+    protected selectedShift: string | null = getShift(new Date());
 
     protected readonly expanded = signal(false);
     protected open = false;
@@ -132,5 +147,10 @@ export class App implements OnDestroy {
 
     protected handleToggle(): void {
         this.expanded.update((e) => !e);
+    }
+
+    protected resetToToday(): void {
+        this.dateValue = TuiDay.currentLocal();
+        this.selectedShift = getShift(new Date());
     }
 }
