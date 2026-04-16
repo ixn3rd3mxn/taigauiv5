@@ -431,11 +431,305 @@
                     บันทึกเหตุ
                 </button>
             </nav>
+            <div style="display: flex; gap: 1rem; justify-content: center;">
+                <div
+                    appearance="floating"
+                    tuiCardLarge
+                    class="stat-card"
+                >
+                    <header tuiHeader>
+                        <h1
+                            tuiTitle
+                            [style.font]="'var(--tui-typography-heading-h1)'"
+                        >
+                            <span tuiSubtitle>ผลรวมทั้งหมดต่อเวร</span>
+                            999
+                        </h1>
 
-            <ng-container>
-            xxx
-            </ng-container>
+                        <aside tuiAccessories>
+                            <div
+                                appearance="primary"
+                                tuiAvatar="@tui.circle-equal"
+                            ></div>
+                        </aside>
+                    </header>
 
+                    <footer>
+                        <div
+                            tuiBadge
+                            class="badge-up"
+                        >
+                            88 เคส
+                            <tui-icon icon="@tui.arrow-up" />
+                        </div>
+                    </footer>
+                </div>
+                <div
+                    appearance="floating"
+                    tuiCardLarge
+                    class="stat-card"
+                >
+                    <header tuiHeader>
+                        <h1
+                            tuiTitle
+                            [style.font]="'var(--tui-typography-heading-h1)'"
+                        >
+                            <span tuiSubtitle>ปรึกษา</span>
+                            77
+                        </h1>
+
+                        <aside tuiAccessories>
+                            <div
+                                appearance="primary"
+                                tuiAvatar="@tui.message-circle-question-mark"
+                            ></div>
+                        </aside>
+                    </header>
+
+                    <footer>
+                        <div
+                            tuiBadge
+                            class="badge-down"
+                        >
+                            66 เคส
+                            <tui-icon icon="@tui.arrow-down" />
+                        </div>
+                    </footer>
+                </div>
+                <div
+                    appearance="floating"
+                    tuiCardLarge
+                    class="stat-card"
+                >
+                    <header tuiHeader>
+                        <h1
+                            tuiTitle
+                            [style.font]="'var(--tui-typography-heading-h1)'"
+                        >
+                            <span tuiSubtitle>สายหลุด</span>
+                            55
+                        </h1>
+
+                        <aside tuiAccessories>
+                            <div
+                                appearance="primary"
+                                tuiAvatar="@tui.message-circle-off"
+                            ></div>
+                        </aside>
+                    </header>
+
+                    <footer>
+                        <div
+                            tuiBadge
+                            class="badge-up"
+                        >
+                            44 เคส
+                            <tui-icon icon="@tui.arrow-up" />
+                        </div>
+                    </footer>
+                </div>
+                
+                <div
+                    appearance="floating"
+                    tuiCardLarge
+                    class="stat-card"
+                >
+                    <header tuiHeader>
+                        <h1
+                            tuiTitle
+                            [style.font]="'var(--tui-typography-heading-h1)'"
+                        >
+                            <span tuiSubtitle>ก่อกวน</span>
+                            33
+                        </h1>
+
+                        <aside tuiAccessories>
+                            <div
+                                appearance="primary"
+                                tuiAvatar="@tui.message-circle-x"
+                            ></div>
+                        </aside>
+                    </header>
+
+                    <footer>
+                        <div
+                            tuiBadge
+                            class="badge-equal"
+                        >
+                            เคสเท่ากัน
+                            <tui-icon icon="@tui.target" />
+                        </div>
+                    </footer>
+                </div>
+            </div>
+            
+            <div style="display: flex; gap: 1rem; justify-content: center;">
+                <div
+                    appearance="floating"
+                    tuiCardLarge
+                >
+                    <header tuiHeader>
+                        <h1
+                            tuiTitle
+                            [style.font]="'var(--tui-typography-heading-h1)'"
+                        >
+                            <span tuiSubtitle>แจ้งเหตุ</span>
+                            11
+                        </h1>
+                        <aside tuiAccessories>
+                            <div
+                                appearance="primary"
+                                tuiAvatar="@tui.message-circle-warning"
+                            ></div>
+                        </aside>
+                    </header>
+
+                    <section class="actions">
+                        <div tuiCell="l">
+                            <div tuiTitle [style.font]="'var(--tui-typography-heading-h5)'">
+                                99
+                                <div tuiSubtitle>1669</div>
+                            </div>
+                        </div>
+                        <div tuiCell="l">
+                            <div tuiTitle [style.font]="'var(--tui-typography-heading-h5)'">
+                                66
+                                <div tuiSubtitle>2nd</div>
+                            </div>
+                        </div>
+                        <div tuiCell="l">
+                            <div tuiTitle [style.font]="'var(--tui-typography-heading-h5)'">
+                                88
+                                <div tuiSubtitle>วิทยุ</div>
+                            </div>
+                        </div>
+                        <div tuiCell="l">
+                            <div tuiTitle [style.font]="'var(--tui-typography-heading-h5)'">
+                                55
+                                <div tuiSubtitle>Trauma</div>
+                            </div>
+                        </div>
+                        <div tuiCell="l">
+                            <div tuiTitle [style.font]="'var(--tui-typography-heading-h5)'">
+                                77
+                                <div tuiSubtitle>Non-Trauma</div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <footer>
+                        <div
+                            tuiBadge
+                            class="badge-up"
+                        >
+                            00 เคส มากกว่าเวรเช้าที่ผ่านมา
+                            <tui-icon icon="@tui.arrow-up" />
+                        </div>
+                    </footer>
+                </div>
+
+                <div
+                    appearance="floating"
+                    tuiCardLarge
+                    class="ring-chart-card"
+                >
+                    <header tuiHeader>
+                        <h1
+                            tuiTitle
+                            [style.font]="'var(--tui-typography-heading-h1)'"
+                        >
+                            <span tuiSubtitle>ผลรวมทั้งหมดต่อวัน</span>
+                        </h1>
+                        <aside tuiAccessories>
+                            <div
+                                appearance="primary"
+                                tuiAvatar="@tui.eclipse"
+                            ></div>
+                        </aside>
+                    </header>
+                    <div class="ring-chart-wrapper">
+                        <tui-ring-chart
+                            [value]="chartValue"
+                            [(activeItemIndex)]="chartActiveItemIndex"
+                        >
+                            <span [style.font]="'var(--tui-typography-heading-h3)'">{{ chartSum | tuiAmount: '' }}</span>
+                            <!-- <div>รวม</div> -->
+                        </tui-ring-chart>
+                        <div class="ring-chart-legend">
+                            @for (label of chartLabels; track label) {
+                                <tui-legend-item
+                                    size="s"
+                                    class="ring-chart-item"
+                                    [active]="isChartItemActive($index)"
+                                    [color]="'var(--tui-chart-categorical-' + $index.toString().padStart(2, '0') + ')'"
+                                    [text]="label"
+                                    (tuiHoveredChange)="onChartHover($index, $event)"
+                                >
+                                    <span>{{ (chartValue[$index] || 0) | tuiAmount: '' }}</span>
+                                </tui-legend-item>
+                            }
+                        </div>
+                    </div>
+
+                    <footer>
+                        <div
+                            tuiBadge
+                            class="badge-down"
+                        >
+                            00 เคส น้อยกว่าวันที่ผ่านมา
+                            <tui-icon icon="@tui.arrow-down" />
+                        </div>
+                    </footer>
+                </div>
+
+                <div
+                    appearance="floating"
+                    tuiCardLarge
+                    class="user-card"
+                >
+                    <header tuiHeader>
+                        <h1
+                            tuiTitle
+                            [style.font]="'var(--tui-typography-heading-h1)'"
+                        >
+                            <span tuiSubtitle>เจ้าหน้าที่ทำการ</span>
+                        <div
+                            tuiBadge
+                            class="badge-user"
+                        >
+                            AAA AAA
+                        </div>
+                        <div
+                            tuiBadge
+                            class="badge-user"
+                        >
+                            BBB BBB
+                        </div>
+                        <div
+                            tuiBadge
+                            class="badge-user"
+                        >
+                            CCC CCC
+                        </div>
+                        <div
+                            tuiBadge
+                            class="badge-user"
+                        >
+                            DDD DDD
+                        </div>
+                        </h1>
+                        <aside tuiAccessories>
+                            <div
+                                appearance="primary"
+                                tuiAvatar="@tui.circle-user-round"
+                            ></div>
+                        </aside>
+                    </header>
+
+                    <footer>
+                    </footer>
+                </div>
+            </div>
         </main>
     </div>
 </tui-root>
