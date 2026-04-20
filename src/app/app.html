@@ -127,10 +127,10 @@
         <div tuiAvatar="AI"></div> -->
     </header>
     <div [style.display]="'flex'">
-    <aside
-        [tuiNavigationAside]="expanded()"
-          [style.height]="'calc(100vh - 3rem)'"
-    >
+        <aside
+            [tuiNavigationAside]="expanded()"
+            [style.height]="'calc(100vh - 3rem)'"
+        >
             <header>
                 <button
                     iconStart="@tui.home"
@@ -575,6 +575,7 @@
                 <div
                     appearance="floating"
                     tuiCardLarge
+                    class="multistat-card"
                 >
                     <header tuiHeader>
                         <h1

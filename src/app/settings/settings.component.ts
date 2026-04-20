@@ -54,8 +54,7 @@ import {TuiForm} from '@taiga-ui/layout';
     changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [
         tuiSegmentedOptionsProvider({size: 's'}),
-        tuiButtonOptionsProvider({appearance: '', size: 's'}),
-        tuiDropdownOptionsProvider({align: 'end'}),
+tuiDropdownOptionsProvider({align: 'end'}),
     ],
     hostDirectives: [TuiDropdownDirective, TuiWithDropdownOpen],
 })
