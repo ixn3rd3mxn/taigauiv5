@@ -323,6 +323,14 @@
                     เทส
                 </button>
                 <button
+                    appSettings
+                    iconStart="@tui.settings"
+                    tuiAsideItem
+                    type="button"
+                >
+                    การตั้งค่า
+                </button>
+                <button
                     tuiAsideItem
                     type="button"
                     [iconStart]="expanded() ? '@tui.arrow-left-to-line' : '@tui.arrow-right-to-line'"
@@ -690,33 +698,34 @@
                     <header tuiHeader>
                         <h1
                             tuiTitle
-                            [style.font]="'var(--tui-typography-heading-h1)'"
+                            [style.font]="'var(--tui-typography-body-m)'"
                         >
-                            <span tuiSubtitle>เจ้าหน้าที่ทำการ</span>
-                        <div
-                            tuiBadge
-                            class="badge-user"
-                        >
-                            AAA AAA
-                        </div>
-                        <div
-                            tuiBadge
-                            class="badge-user"
-                        >
-                            BBB BBB
-                        </div>
-                        <div
-                            tuiBadge
-                            class="badge-user"
-                        >
-                            CCC CCC
-                        </div>
-                        <div
-                            tuiBadge
-                            class="badge-user"
-                        >
-                            DDD DDD
-                        </div>
+                            <span tuiSubtitle [style.padding-bottom.rem]="0.5">เจ้าหน้าที่ทำการ</span>
+                            <!-- ยังไม่มีการกำหนดเจ้าหน้าที่ -->
+                            <div
+                                tuiBadge
+                                class="badge-user"
+                            >
+                                นายวันศายนนท์ ฮัจญีย์เราะห์อีส
+                            </div>
+                            <div
+                                tuiBadge
+                                class="badge-user"
+                            >
+                                นางเจะรอฮานี วันหวัง
+                            </div>
+                            <div
+                                tuiBadge
+                                class="badge-user"
+                            >
+                                นางสาวรวิภา บุญณฤมิตร
+                            </div>
+                            <div
+                                tuiBadge
+                                class="badge-user"
+                            >
+                                นางสาวนิฮานาน วาแม
+                            </div>
                         </h1>
                         <aside tuiAccessories>
                             <div

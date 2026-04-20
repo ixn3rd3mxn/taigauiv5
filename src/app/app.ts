@@ -40,6 +40,7 @@ import {
     TuiBreadcrumbs,
 } from '@taiga-ui/kit';
 import {TuiCardLarge, TuiForm, TuiHeader, TuiNavigation} from '@taiga-ui/layout';
+import {SettingsComponent} from './settings/settings.component';
 import {TuiLegendItem, TuiRingChart} from '@taiga-ui/addon-charts';
 import {TuiAmountPipe} from '@taiga-ui/addon-commerce';
 
@@ -99,6 +100,7 @@ function getShift(date: Date): string {
         TuiHovered,
         TuiLegendItem,
         TuiRingChart,
+        SettingsComponent,
     ],
     templateUrl: './app.html',
     styleUrl: './app.less',
