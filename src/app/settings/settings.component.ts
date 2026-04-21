@@ -59,8 +59,8 @@ tuiDropdownOptionsProvider({align: 'end'}),
     hostDirectives: [TuiDropdownDirective, TuiWithDropdownOpen],
 })
 export class SettingsComponent {
-    private readonly doc = inject(DOCUMENT);
-    private readonly switcher = inject(TuiLanguageSwitcherService);
+    // private readonly doc = inject(DOCUMENT);
+    // private readonly switcher = inject(TuiLanguageSwitcherService);
     private readonly theme = inject(TUI_DARK_MODE);
     private readonly stored = inject(WA_LOCAL_STORAGE)?.getItem(
         inject(TUI_DARK_MODE_KEY),
@@ -93,7 +93,7 @@ export class SettingsComponent {
     // protected readonly names: TuiLanguageName[] = Array.from(this.flags.keys());
     protected readonly form = inject(NonNullableFormBuilder).group({
         theme: tuiIsString(this.stored) ? this.theme() : null,
-        direction: 'ltr',
+        // direction: 'ltr',
         // language: this.switcher.language,
         // platform: 'web' as 'android' | 'ios' | 'web',
     });
@@ -102,10 +102,10 @@ export class SettingsComponent {
         .pipe(takeUntilDestroyed())
         .subscribe(() => {
             // const {theme, direction, language, platform} = this.form.getRawValue();
-            const {theme, direction} = this.form.getRawValue();
+            const {theme} = this.form.getRawValue();
 
             // this.switcher.setLanguage(language);
-            this.doc.documentElement.setAttribute('dir', direction);
+            // this.doc.documentElement.setAttribute('dir', direction);
             // this.doc.documentElement.setAttribute('data-platform', platform);
 
             if (theme === null) {

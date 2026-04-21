@@ -429,9 +429,38 @@
                     tuiButton
                     type="button"
                     [style.margin-inline-start]="'auto'"
+                    (click)="onAssignStaffClick(assignStaffContent)"
                 >
                     กำหนดเจ้าหน้าที่
                 </button>
+
+                <ng-template
+                    #assignStaffContent
+                    let-context
+                >
+                    <form tuiForm>
+                        <tui-textfield>
+                            <label tuiLabel>ชื่อเจ้าหน้าที่</label>
+                            <input
+                                name="staffName"
+                                placeholder="ชื่อ-นามสกุล"
+                                tuiAutoFocus
+                                tuiInput
+                                [ngModel]="staffValue"
+                                (ngModelChange)="onStaffModelChange($event)"
+                            />
+                        </tui-textfield>
+                        <footer>
+                            <button
+                                tuiButton
+                                type="submit"
+                                (click.prevent)="context.complete()"
+                            >
+                                บันทึก
+                            </button>
+                        </footer>
+                    </form>
+                </ng-template>
                 <button
                     tuiButton
                     type="button"

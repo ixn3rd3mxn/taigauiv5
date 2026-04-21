@@ -1,5 +1,7 @@
 import {isPlatformBrowser, KeyValuePipe, NgTemplateOutlet} from '@angular/common';
-import {TuiHovered, TuiPlatform, tuiSum} from '@taiga-ui/cdk';
+import {TuiAutoFocus, TuiHovered, TuiPlatform, tuiSum} from '@taiga-ui/cdk';
+import {TuiResponsiveDialogService} from '@taiga-ui/addon-mobile';
+import {type PolymorpheusContent} from '@taiga-ui/polymorpheus';
 import {
     ChangeDetectionStrategy,
     Component,
@@ -16,8 +18,10 @@ import {
     TuiButton,
     TuiCell,
     TuiDataList,
+    TuiDialogService,
     TuiDropdown,
     TuiIcon,
+    TuiLabel,
     TuiRoot,
     TuiTextfield,
     TuiTitle,
@@ -30,6 +34,7 @@ import {
     TuiAvatar,
     TuiBadge,
     TuiChevron,
+    TuiConfirmService,
     TuiDataListDropdownManager,
     TuiDataListWrapper,
     TuiFade,
@@ -90,12 +95,14 @@ function getShift(date: Date): string {
         TuiRoot,
         TuiSelect,
         TuiSwitch,
+        TuiAutoFocus,
         TuiTabs,
         TuiTextfield,
         TuiTitle,
         TuiBreadcrumbs,
         TuiInput,
         TuiLink,
+        TuiLabel,
         TuiAmountPipe,
         TuiHovered,
         TuiLegendItem,
@@ -120,10 +127,17 @@ function getShift(date: Date): string {
                 'จ.', 'อ.', 'พ.', 'พฤ.', 'ศ.', 'ส.', 'อา.',
             ] as const),
         },
+        TuiConfirmService,
+        {
+            provide: TuiDialogService,
+            useExisting: TuiResponsiveDialogService,
+        },
     ],
 })
 export class App implements OnDestroy {
     private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+    private readonly confirm = inject(TuiConfirmService);
+    private readonly dialogs = inject(TuiDialogService);
     private readonly now = signal(new Date());
     private readonly intervalId: ReturnType<typeof setInterval> | null = null;
 
@@ -197,5 +211,28 @@ export class App implements OnDestroy {
     protected resetToToday(): void {
         this.dateValue = TuiDay.currentLocal();
         this.selectedShift = getShift(new Date());
+    }
+
+    protected staffValue = '';
+
+    protected onStaffModelChange(value: string): void {
+        this.staffValue = value;
+        this.confirm.markAsDirty();
+    }
+
+    protected onAssignStaffClick(content: PolymorpheusContent): void {
+        const closable = this.confirm.withConfirm({
+            label: 'ยืนยันการออก?',
+            data: {content: 'ข้อมูลที่กรอกจะ<strong>ไม่ถูกบันทึก</strong>'},
+        });
+
+        this.dialogs
+            .open(content, {label: 'กำหนดเจ้าหน้าที่', closable, dismissible: closable})
+            .subscribe({
+                complete: () => {
+                    this.staffValue = '';
+                    this.confirm.markAsPristine();
+                },
+            });
     }
 }
