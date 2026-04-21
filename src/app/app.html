@@ -438,28 +438,108 @@
                     #assignStaffContent
                     let-context
                 >
-                    <form tuiForm>
-                        <tui-textfield>
-                            <label tuiLabel>ชื่อเจ้าหน้าที่</label>
-                            <input
-                                name="staffName"
-                                placeholder="ชื่อ-นามสกุล"
-                                tuiAutoFocus
-                                tuiInput
-                                [ngModel]="staffValue"
-                                (ngModelChange)="onStaffModelChange($event)"
-                            />
-                        </tui-textfield>
-                        <footer>
-                            <button
-                                tuiButton
-                                type="submit"
-                                (click.prevent)="context.complete()"
-                            >
-                                บันทึก
-                            </button>
-                        </footer>
-                    </form>
+
+                    <!-- <div [style.margin-block-end.rem]="2">
+                        <tui-radio-list
+                            [itemContent]="staffSizeContent"
+                            [items]="staffSizes"
+                            [style.flex-direction]="'row'"
+                            [style.width]="'max-content'"
+                            [(ngModel)]="staffTableSize"
+                        />
+                        <ng-template
+                            #staffSizeContent
+                            let-value
+                        >
+                            {{ value === 's' ? 'เล็ก' : value === 'm' ? 'กลาง' : 'ใหญ่' }}
+                        </ng-template>
+                    </div> -->
+
+                    <table
+                        tuiTable
+                        [size]="staffTableSize"
+                        (ngModelChange)="onStaffSelect()"
+                        [(ngModel)]="staffSelected"
+                    >
+                        <thead>
+                            <tr>
+                                <th tuiTh>
+                                    <div [tuiCell]="staffTableSize">
+                                        <input
+                                            tuiCheckbox
+                                            tuiCheckboxTable
+                                            type="checkbox"
+                                            [size]="staffTableSize === 'l' ? 'm' : 's'"
+                                        />
+                                        <span tuiTitle>ชื่อ-สกุล</span>
+                                    </div>
+                                </th>
+                                <!-- <th tuiTh>ตำแหน่ง</th> -->
+                                <!-- <th tuiTh>ประเภท</th> -->
+                                <th tuiTh>สถานะ</th>
+                                <!-- <th tuiTh>การกระทำ</th> -->
+                            </tr>
+                        </thead>
+                        <tbody tuiTbody>
+                            @for (item of staffData; track item) {
+                                <tr>
+                                    <td tuiTd>
+                                        <div [tuiCell]="staffTableSize">
+                                            <input
+                                                tuiCheckbox
+                                                type="checkbox"
+                                                [size]="staffTableSize === 'l' ? 'm' : 's'"
+                                                [tuiCheckboxRow]="item"
+                                            />
+                                            <span tuiTitle>
+                                                {{ item.name }}
+                                                <!-- <span tuiSubtitle>{{ item.id }}</span> -->
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <!-- <td tuiTd>
+                                        <div [tuiCell]="staffTableSize">
+                                            <div
+                                                [style.background]="item.name | tuiAutoColor"
+                                                [tuiAvatar]="item.name | tuiInitials"
+                                            ></div>
+                                            <span tuiTitle>
+                                                {{ item.name }}
+                                                <span tuiSubtitle>{{ item.role }}</span>
+                                            </span>
+                                        </div>
+                                    </td> -->
+                                    <!-- <td tuiTd>{{ item.type }}</td> -->
+                                    <td tuiTd>
+                                        <span [tuiStatus]="item.status.color">{{ item.status.value }}</span>
+                                    </td>
+                                    <!-- <td tuiTd>
+                                        <span tuiStatus>
+                                            <button
+                                                appearance="action"
+                                                iconStart="@tui.pencil"
+                                                size="xs"
+                                                tuiIconButton
+                                                type="button"
+                                            >
+                                                แก้ไข
+                                            </button>
+                                        </span>
+                                    </td> -->
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+
+                    <footer>
+                        <button
+                            tuiButton
+                            type="submit"
+                            (click.prevent)="context.complete()"
+                        >
+                            บันทึก
+                        </button>
+                    </footer>
                 </ng-template>
                 <button
                     tuiButton

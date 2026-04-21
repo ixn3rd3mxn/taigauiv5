@@ -1,6 +1,7 @@
 import {isPlatformBrowser, KeyValuePipe, NgTemplateOutlet} from '@angular/common';
 import {TuiAutoFocus, TuiHovered, TuiPlatform, tuiSum} from '@taiga-ui/cdk';
 import {TuiResponsiveDialogService} from '@taiga-ui/addon-mobile';
+import {TuiTable, TuiTableControl} from '@taiga-ui/addon-table';
 import {type PolymorpheusContent} from '@taiga-ui/polymorpheus';
 import {
     ChangeDetectionStrategy,
@@ -17,6 +18,7 @@ import {TuiDay} from '@taiga-ui/cdk';
 import {
     TuiButton,
     TuiCell,
+    TuiCheckbox,
     TuiDataList,
     TuiDialogService,
     TuiDropdown,
@@ -31,6 +33,7 @@ import {
     TUI_SHORT_WEEK_DAYS,
 } from '@taiga-ui/core';
 import {
+    TuiAutoColorPipe,
     TuiAvatar,
     TuiBadge,
     TuiChevron,
@@ -38,8 +41,11 @@ import {
     TuiDataListDropdownManager,
     TuiDataListWrapper,
     TuiFade,
+    TuiInitialsPipe,
     TuiInputDate,
+    TuiRadioList,
     TuiSelect,
+    TuiStatus,
     TuiSwitch,
     TuiTabs,
     TuiBreadcrumbs,
@@ -75,11 +81,14 @@ function getShift(date: Date): string {
         KeyValuePipe,
         NgTemplateOutlet,
         RouterLink,
+        TuiAmountPipe,
+        TuiAutoColorPipe,
         TuiAvatar,
         TuiBadge,
         TuiButton,
         TuiCardLarge,
         TuiCell,
+        TuiCheckbox,
         TuiChevron,
         TuiDataList,
         TuiDataListDropdownManager,
@@ -88,14 +97,23 @@ function getShift(date: Date): string {
         TuiFade,
         TuiForm,
         TuiHeader,
+        TuiHovered,
         TuiIcon,
+        TuiInitialsPipe,
+        TuiInput,
         TuiInputDate,
+        TuiLegendItem,
         TuiNavigation,
         TuiPlatform,
+        TuiRadioList,
+        TuiRingChart,
         TuiRoot,
         TuiSelect,
+        TuiStatus,
         TuiSwitch,
         TuiAutoFocus,
+        TuiTable,
+        TuiTableControl,
         TuiTabs,
         TuiTextfield,
         TuiTitle,
@@ -213,24 +231,47 @@ export class App implements OnDestroy {
         this.selectedShift = getShift(new Date());
     }
 
-    protected staffValue = '';
+    protected readonly staffSizes = ['l', 'm', 's'] as const;
+    protected staffTableSize: 'l' | 'm' | 's' = this.staffSizes[1];
+    protected staffSelected: object[] = [];
 
-    protected onStaffModelChange(value: string): void {
-        this.staffValue = value;
+    protected readonly staffData = [
+        {
+            name: 'นายวันศายนนท์ ฮัจญีย์เราะห์อีส',
+            // id: 'EMS-001',
+            // role: 'พยาบาลฉุกเฉิน',
+            // type: 'ALS',
+            status: {value: 'ว่าง', color: 'var(--tui-status-positive)'},
+        },
+        {
+            name: 'นางเจะรอฮานี วันหวัง',
+            status: {value: 'ประจำการ', color: 'var(--tui-status-warning)'},
+        },
+        {
+            name: 'นางสาวรวิภา บุญณฤมิตร',
+            status: {value: 'ว่าง', color: 'var(--tui-status-positive)'},
+        },
+        {
+            name: 'นางสาวนิฮานาน วาแม',
+            status: {value: 'หยุด', color: 'var(--tui-status-negative)'},
+        },
+    ];
+
+    protected onStaffSelect(): void {
         this.confirm.markAsDirty();
     }
 
     protected onAssignStaffClick(content: PolymorpheusContent): void {
         const closable = this.confirm.withConfirm({
             label: 'ยืนยันการออก?',
-            data: {content: 'ข้อมูลที่กรอกจะ<strong>ไม่ถูกบันทึก</strong>'},
+            data: {content: 'การเลือกจะ<strong>ไม่ถูกบันทึก</strong>'},
         });
 
         this.dialogs
-            .open(content, {label: 'กำหนดเจ้าหน้าที่', closable, dismissible: closable})
+            .open(content, {label: 'กำหนดเจ้าหน้าที่', closable, dismissible: closable, size: 'l'})
             .subscribe({
                 complete: () => {
-                    this.staffValue = '';
+                    this.staffSelected = [];
                     this.confirm.markAsPristine();
                 },
             });
