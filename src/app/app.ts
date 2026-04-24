@@ -49,6 +49,8 @@ import {
     TuiSwitch,
     TuiTabs,
     TuiBreadcrumbs,
+    TUI_CONFIRM,
+    type TuiConfirmData,
 } from '@taiga-ui/kit';
 import {TuiCardLarge, TuiForm, TuiHeader, TuiNavigation} from '@taiga-ui/layout';
 import {SettingsComponent} from './settings/settings.component';
@@ -289,6 +291,26 @@ export class App implements OnDestroy {
                 error: () => {
                     this.staffSelected = [...this.initialStaffSelected];
                     this.confirm.markAsPristine();
+                },
+            });
+    }
+
+    protected onSaveConfirm(outerContext: {complete: () => void}): void {
+        const data: TuiConfirmData = {
+            content: 'ข้อมูลที่เลือกจะ<strong>ถูกบันทึก</strong>',
+            yes: 'ยืนยัน',
+            no: 'ยกเลิก',
+        };
+
+        this.dialogs
+            .open<boolean>(TUI_CONFIRM, {
+                label: 'ยืนยันการบันทึก?',
+                size: 's',
+                data,
+            })
+            .subscribe({
+                next: (confirmed) => {
+                    if (confirmed) outerContext.complete();
                 },
             });
     }
