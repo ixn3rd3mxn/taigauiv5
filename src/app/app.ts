@@ -257,23 +257,44 @@ export class App implements OnDestroy {
         },
     ];
 
-    protected onStaffSelect(): void {
-        this.confirm.markAsDirty();
+    private initialStaffSelected: object[] = [];
+
+    protected onStaffSelectionChange(value: object[]): void {
+        this.staffSelected = value;
+        const isDirty = !this.isSameStaffSelection(this.staffSelected, this.initialStaffSelected);
+
+        if (isDirty) {
+            this.confirm.markAsDirty();
+        } else {
+            this.confirm.markAsPristine();
+        }
     }
 
     protected onAssignStaffClick(content: PolymorpheusContent): void {
+        this.initialStaffSelected = [...this.staffSelected];
+        this.confirm.markAsPristine();
+
         const closable = this.confirm.withConfirm({
             label: 'ยืนยันการออก?',
             data: {content: 'การเลือกจะ<strong>ไม่ถูกบันทึก</strong>'},
         });
 
         this.dialogs
-            .open(content, {label: 'กำหนดเจ้าหน้าที่', closable, dismissible: closable, size: 'l'})
+            .open(content, {label: 'กำหนดเจ้าหน้าที่', closable, dismissible: closable, size: 'm'})
             .subscribe({
                 complete: () => {
-                    this.staffSelected = [];
+                    this.initialStaffSelected = [...this.staffSelected];
+                    this.confirm.markAsPristine();
+                },
+                error: () => {
+                    this.staffSelected = [...this.initialStaffSelected];
                     this.confirm.markAsPristine();
                 },
             });
+    }
+
+    private isSameStaffSelection(a: object[], b: object[]): boolean {
+        if (a.length !== b.length) return false;
+        return a.every((item) => b.includes(item));
     }
 }

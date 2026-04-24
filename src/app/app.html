@@ -458,7 +458,7 @@
                     <table
                         tuiTable
                         [size]="staffTableSize"
-                        (ngModelChange)="onStaffSelect()"
+                        (ngModelChange)="onStaffSelectionChange($event)"
                         [(ngModel)]="staffSelected"
                     >
                         <thead>
