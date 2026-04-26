@@ -85,10 +85,30 @@
     margin: 0 0 0.75rem;
 }
 
+.staff-viewport {
+    block-size: 16.85rem;
+
+    table {
+        inline-size: 100%;
+
+        th {
+            inset-block-start: inherit;
+        }
+
+        tr {
+            block-size: 2.8125rem;
+        }
+    }
+}
+
 [tuiTh],
 [tuiTd] {
     border-inline-start: none;
     border-inline-end: none;
+}
+
+[tuiTh] {
+    border-block-start: none;
 }
 
 [tuiTable][data-size='s'] [tuiTitle] {

@@ -1,4 +1,9 @@
 import {isPlatformBrowser, KeyValuePipe, NgTemplateOutlet} from '@angular/common';
+import {
+    CdkFixedSizeVirtualScroll,
+    CdkVirtualForOf,
+    CdkVirtualScrollViewport,
+} from '@angular/cdk/scrolling';
 import {TuiAutoFocus, TuiHovered, TuiPlatform, tuiSum} from '@taiga-ui/cdk';
 import {TuiResponsiveDialogService} from '@taiga-ui/addon-mobile';
 import {TuiTable, TuiTableControl} from '@taiga-ui/addon-table';
@@ -25,6 +30,8 @@ import {
     TuiIcon,
     TuiLabel,
     TuiRoot,
+    TuiScrollable,
+    TuiScrollbar,
     TuiTextfield,
     TuiTitle,
     TuiInput,
@@ -79,6 +86,9 @@ function getShift(date: Date): string {
 @Component({
     selector: 'app-root',
     imports: [
+        CdkFixedSizeVirtualScroll,
+        CdkVirtualForOf,
+        CdkVirtualScrollViewport,
         FormsModule,
         KeyValuePipe,
         NgTemplateOutlet,
@@ -110,6 +120,8 @@ function getShift(date: Date): string {
         TuiRadioList,
         TuiRingChart,
         TuiRoot,
+        TuiScrollable,
+        TuiScrollbar,
         TuiSelect,
         TuiStatus,
         TuiSwitch,
@@ -234,7 +246,6 @@ export class App implements OnDestroy {
     }
 
     protected readonly staffSizes = ['l', 'm', 's'] as const;
-    protected staffTableSize: 'l' | 'm' | 's' = this.staffSizes[1];
     protected staffSelected: object[] = [];
 
     protected readonly staffData = [
@@ -244,6 +255,30 @@ export class App implements OnDestroy {
             // role: 'พยาบาลฉุกเฉิน',
             // type: 'ALS',
             status: {value: 'ว่าง', color: 'var(--tui-status-positive)'},
+        },
+        {
+            name: 'นางเจะรอฮานี วันหวัง',
+            status: {value: 'ประจำการ', color: 'var(--tui-status-warning)'},
+        },
+        {
+            name: 'นางสาวรวิภา บุญณฤมิตร',
+            status: {value: 'ว่าง', color: 'var(--tui-status-positive)'},
+        },
+        {
+            name: 'นางสาวนิฮานาน วาแม',
+            status: {value: 'หยุด', color: 'var(--tui-status-negative)'},
+        },
+        {
+            name: 'นางเจะรอฮานี วันหวัง',
+            status: {value: 'ประจำการ', color: 'var(--tui-status-warning)'},
+        },
+        {
+            name: 'นางสาวรวิภา บุญณฤมิตร',
+            status: {value: 'ว่าง', color: 'var(--tui-status-positive)'},
+        },
+        {
+            name: 'นางสาวนิฮานาน วาแม',
+            status: {value: 'หยุด', color: 'var(--tui-status-negative)'},
         },
         {
             name: 'นางเจะรอฮานี วันหวัง',

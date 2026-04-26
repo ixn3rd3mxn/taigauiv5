@@ -455,81 +455,77 @@
                         </ng-template>
                     </div> -->
 
-                    <table
-                        tuiTable
-                        [size]="staffTableSize"
-                        (ngModelChange)="onStaffSelectionChange($event)"
-                        [(ngModel)]="staffSelected"
-                    >
-                        <thead>
-                            <tr>
-                                <th tuiTh>
-                                    <div [tuiCell]="staffTableSize">
-                                        <input
-                                            tuiCheckbox
-                                            tuiCheckboxTable
-                                            type="checkbox"
-                                            [size]="staffTableSize === 'l' ? 'm' : 's'"
-                                        />
-                                        <span tuiTitle>ชื่อ-สกุล</span>
-                                    </div>
-                                </th>
-                                <!-- <th tuiTh>ตำแหน่ง</th> -->
-                                <!-- <th tuiTh>ประเภท</th> -->
-                                <th tuiTh>สถานะ</th>
-                                <!-- <th tuiTh>การกระทำ</th> -->
-                            </tr>
-                        </thead>
-                        <tbody tuiTbody>
-                            @for (item of staffData; track item) {
-                                <tr>
-                                    <td tuiTd>
-                                        <div [tuiCell]="staffTableSize">
-                                            <input
-                                                tuiCheckbox
-                                                type="checkbox"
-                                                [size]="staffTableSize === 'l' ? 'm' : 's'"
-                                                [tuiCheckboxRow]="item"
-                                            />
-                                            <span tuiTitle>
-                                                {{ item.name }}
-                                                <!-- <span tuiSubtitle>{{ item.id }}</span> -->
-                                            </span>
-                                        </div>
-                                    </td>
-                                    <!-- <td tuiTd>
-                                        <div [tuiCell]="staffTableSize">
+                    <tui-scrollbar>
+                        <cdk-virtual-scroll-viewport
+                            #viewport
+                            appendOnly
+                            tuiScrollable
+                            class="staff-viewport tui-zero-scrollbar"
+                            [itemSize]="45"
+                            [maxBufferPx]="500"
+                            [minBufferPx]="400"
+                        >
+                            <table
+                                tuiTable
+                                (ngModelChange)="onStaffSelectionChange($event)"
+                                [(ngModel)]="staffSelected"
+                            >
+                                <thead>
+                                    <tr [style.inset-block-start.px]="-(viewport.getOffsetToRenderedContentStart() || 0)">
+                                        <th
+                                            tuiTh
+                                            [sticky]="true"
+                                        >
                                             <div
-                                                [style.background]="item.name | tuiAutoColor"
-                                                [tuiAvatar]="item.name | tuiInitials"
-                                            ></div>
-                                            <span tuiTitle>
-                                                {{ item.name }}
-                                                <span tuiSubtitle>{{ item.role }}</span>
-                                            </span>
-                                        </div>
-                                    </td> -->
-                                    <!-- <td tuiTd>{{ item.type }}</td> -->
-                                    <td tuiTd>
-                                        <span [tuiStatus]="item.status.color">{{ item.status.value }}</span>
-                                    </td>
-                                    <!-- <td tuiTd>
-                                        <span tuiStatus>
-                                            <button
-                                                appearance="action"
-                                                iconStart="@tui.pencil"
-                                                size="xs"
-                                                tuiIconButton
-                                                type="button"
+                                                [style.display]="'flex'"
+                                                [style.justify-content]="'center'"
                                             >
-                                                แก้ไข
-                                            </button>
-                                        </span>
-                                    </td> -->
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
+                                                <!-- <input
+                                                    tuiCheckbox
+                                                    tuiCheckboxTable
+                                                    type="checkbox"
+                                                /> -->
+                                            </div>
+                                        </th>
+                                        <th
+                                            tuiTh
+                                            [sticky]="true"
+                                        >
+                                                <span tuiTitle>ชื่อ-สกุล</span>
+                                        </th>
+                                        <th
+                                            tuiTh
+                                            [sticky]="true"
+                                        >
+                                            สถานะ
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody tuiTbody>
+                                    <tr *cdkVirtualFor="let item of staffData">
+                                        <td tuiTd>
+                                            <div
+                                                [style.display]="'flex'"
+                                                [style.justify-content]="'center'"
+                                            >
+                                                <input
+                                                    tuiCheckbox
+                                                    type="checkbox"
+                                                    [tuiCheckboxRow]="item"
+                                                />
+                                            </div>
+                                        </td>
+                                        <td tuiTd>
+                                                <span tuiTitle>{{ item.name }}</span>
+                                        </td>
+                                        <td tuiTd>
+                                            <span [tuiStatus]="item.status.color">{{ item.status.value }}</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </cdk-virtual-scroll-viewport>
+                    </tui-scrollbar>
 
                     <footer>
                         <button
