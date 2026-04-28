@@ -455,6 +455,20 @@
                         </ng-template>
                     </div> -->
 
+                    <search tuiSearch [style.margin-block-end.rem]="0.5">
+                        <form [formGroup]="searchForm">
+                            <fieldset tuiTextfieldSize="m">
+                                <tui-textfield iconStart="@tui.search">
+                                    <input
+                                        formControlName="search"
+                                        placeholder="ค้นหา"
+                                        tuiInput
+                                    />
+                                </tui-textfield>
+                            </fieldset>
+                        </form>
+                    </search>
+
                     <tui-scrollbar>
                         <cdk-virtual-scroll-viewport
                             #viewport
@@ -502,7 +516,7 @@
                                     </tr>
                                 </thead>
                                 <tbody tuiTbody>
-                                    <tr *cdkVirtualFor="let item of staffData">
+                                    <tr *cdkVirtualFor="let item of filteredStaffData()">
                                         <td tuiTd>
                                             <div
                                                 [style.display]="'flex'"
@@ -537,12 +551,134 @@
                         </button>
                     </footer>
                 </ng-template>
+
                 <button
                     tuiButton
                     type="button"
+                    (click)="onRecordIncidentClick(recordIncidentContent)"
                 >
                     บันทึกเหตุ
                 </button>
+
+                <ng-template
+                    #recordIncidentContent
+                    let-context
+                >
+                    <form [formGroup]="recordIncidentForm">
+                        <span class="incident-label">ประเภท</span>
+                        <div
+                            tuiGroup
+                            class="incident-group"
+                            [collapsed]="true"
+                        >
+                            @for (opt of incidentTypes; track opt) {
+                                <label tuiBlock>
+                                    <input
+                                        formControlName="type"
+                                        tuiRadio
+                                        type="radio"
+                                        [value]="opt"
+                                    />
+                                    {{ opt }}
+                                </label>
+                            }
+                        </div>
+                        <tui-error
+                            formControlName="type"
+                            [style.margin-block-end.rem]="0.75"
+                        />
+
+                        <span
+                            class="incident-label"
+                            [style.color]="incidentSubfieldsDisabled() ? 'var(--tui-border-focus)' : null"
+                        >ช่องทางการแจ้งเหตุ</span>
+                        <div
+                            tuiGroup
+                            class="incident-group"
+                            [collapsed]="true"
+                            [style.width.rem]="20"
+                        >
+                            @for (opt of incidentSubtypes; track opt) {
+                                <label tuiBlock>
+                                    <input
+                                        formControlName="subtype"
+                                        tuiRadio
+                                        type="radio"
+                                        [value]="opt"
+                                    />
+                                    {{ opt }}
+                                </label>
+                            }
+                        </div>
+                        <tui-error
+                            formControlName="subtype"
+                            [style.margin-block-end.rem]="0.75"
+                        />
+
+                        <span
+                            class="incident-label"
+                            [style.color]="incidentSubfieldsDisabled() ? 'var(--tui-border-focus)' : null"
+                        >ระดับความรุนแรง</span>
+                        <div
+                            tuiGroup
+                            class="incident-group"
+                            [collapsed]="true"
+                            [style.width.rem]="19"
+                        >
+                            @for (opt of incidentLevels; track opt) {
+                                <label tuiBlock>
+                                    <input
+                                        formControlName="level"
+                                        tuiRadio
+                                        type="radio"
+                                        [value]="opt"
+                                    />
+                                    {{ opt }}
+                                </label>
+                            }
+                        </div>
+                        <tui-error
+                            formControlName="level"
+                            [style.margin-block-end.rem]="0.75"
+                        />
+
+                        <span
+                            class="incident-label"
+                            [style.color]="incidentSubfieldsDisabled() ? 'var(--tui-border-focus)' : null"
+                        >ระดับ CBD</span>
+                        <div
+                            tuiGroup
+                            class="incident-group"
+                            [collapsed]="true"
+                        >
+                            @for (opt of incidentCbdLevels; track opt) {
+                                <label tuiBlock>
+                                    <input
+                                        formControlName="cbd"
+                                        tuiRadio
+                                        type="radio"
+                                        [value]="opt"
+                                    />
+                                    {{ opt }}
+                                </label>
+                            }
+                        </div>
+                        <tui-error
+                            formControlName="cbd"
+                            [style.margin-block-end.rem]="0.75"
+                        />
+                    </form>
+
+                    <footer>
+                        <button
+                            tuiButton
+                            type="submit"
+                            (click.prevent)="onRecordIncidentSave(context)"
+                        >
+                            บันทึก
+                        </button>
+                    </footer>
+                </ng-template>
             </nav>
             <div style="display: flex; gap: 1rem; justify-content: center;">
                 <div
@@ -807,31 +943,17 @@
                             [style.font]="'var(--tui-typography-body-m)'"
                         >
                             <span tuiSubtitle [style.padding-bottom.rem]="0.5">เจ้าหน้าที่ทำการ</span>
-                            <!-- ยังไม่มีการกำหนดเจ้าหน้าที่ -->
-                            <div
-                                tuiBadge
-                                class="badge-user"
-                            >
-                                นายวันศายนนท์ ฮัจญีย์เราะห์อีส
-                            </div>
-                            <div
-                                tuiBadge
-                                class="badge-user"
-                            >
-                                นางเจะรอฮานี วันหวัง
-                            </div>
-                            <div
-                                tuiBadge
-                                class="badge-user"
-                            >
-                                นางสาวรวิภา บุญณฤมิตร
-                            </div>
-                            <div
-                                tuiBadge
-                                class="badge-user"
-                            >
-                                นางสาวนิฮานาน วาแม
-                            </div>
+                            @if (assignedStaff().length === 0) {
+                                <span>ยังไม่มีการกำหนดเจ้าหน้าที่</span>
+                            }
+                            @for (staff of assignedStaff(); track staff.rescue_id) {
+                                <div
+                                    tuiBadge
+                                    class="badge-user"
+                                >
+                                    {{ staff.name }}
+                                </div>
+                            }
                         </h1>
                         <aside tuiAccessories>
                             <div
