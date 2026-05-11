@@ -119,6 +119,22 @@ def get_incident_summary(
     return summary
 
 
+@app.get("/incident/cbd-summary")
+def get_cbd_summary(date: str = Query(...), shift_id: int = Query(...)):
+    query = {"date": date, "shift_id": shift_id, "type": "แจ้งเหตุ"}
+    incidents = list(incident_collection.find(query, {"_id": 0}))
+    by_criteria: dict[str, int] = {}
+    by_level: dict[str, int] = {}
+    for inc in incidents:
+        cbd_criteria = inc.get("cbd_criteria")
+        cbd_level = inc.get("cbd_level")
+        if cbd_criteria:
+            by_criteria[cbd_criteria] = by_criteria.get(cbd_criteria, 0) + 1
+        if cbd_level:
+            by_level[cbd_level] = by_level.get(cbd_level, 0) + 1
+    return {"by_criteria": by_criteria, "by_level": by_level}
+
+
 @app.get("/incident/list")
 def get_incident_list(
     date: str = Query(...),

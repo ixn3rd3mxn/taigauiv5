@@ -64,8 +64,8 @@ import {
 } from '@taiga-ui/kit';
 import {TuiCardLarge, TuiForm, TuiHeader, TuiNavigation} from '@taiga-ui/layout';
 import {SettingsComponent} from './settings/settings.component';
-import {ApiService, type IncidentSummary} from './services/api.service';
-import {TuiLegendItem, TuiRingChart} from '@taiga-ui/addon-charts';
+import {ApiService, type CbdSummary, type IncidentSummary} from './services/api.service';
+import {TuiAxes, TuiBarChart, TuiLegendItem, TuiRingChart} from '@taiga-ui/addon-charts';
 import {TuiAmountPipe} from '@taiga-ui/addon-commerce';
 
 const ICON =
@@ -142,6 +142,8 @@ function msUntilNextShiftBoundary(): number {
         TuiInitialsPipe,
         TuiInput,
         TuiInputDate,
+        TuiAxes,
+        TuiBarChart,
         TuiLegendItem,
         TuiNavigation,
         TuiPlatform,
@@ -243,6 +245,39 @@ export class App implements OnDestroy {
             trauma: s?.['แจ้งเหตุ'].trauma ?? 0,
             nonTrauma: s?.['แจ้งเหตุ'].non_trauma ?? 0,
         };
+    });
+
+    // ── CBD chart ─────────────────────────────────────────────────────────────
+    protected readonly cbdSummary = signal<CbdSummary | null>(null);
+
+    private readonly cbdCriteriaSorted = computed(() => {
+        const s = this.cbdSummary();
+        return this.rawCbdCriteria()
+            .map((c) => ({id: c.cbdcriteria_id, detail: c.cbdcriteria_detail, count: s?.by_criteria[c.cbdcriteria_detail] ?? 0}))
+            .sort((a, b) => b.count - a.count)
+            .slice(0, 5);
+    });
+
+    protected readonly cbdCriteriaChartValue = computed(
+        (): ReadonlyArray<ReadonlyArray<number>> => {
+            const items = this.cbdCriteriaSorted();
+            if (!items.length) return [[]];
+            return [items.map((item) => item.count)];
+        },
+    );
+
+    protected readonly cbdCriteriaLabelsX = computed(() =>
+        this.cbdCriteriaSorted().map((item) => `CBD ${item.id}`),
+    );
+
+    protected readonly cbdCriteriaChartMax = computed(() => {
+        const vals = this.cbdCriteriaChartValue()[0] ?? [];
+        return Math.max(...vals, 1);
+    });
+
+    protected readonly cbdCriteriaLabelsY = computed(() => {
+        const max = this.cbdCriteriaChartMax();
+        return ['0', String(max)];
     });
 
     protected readonly chartValue = computed(() => this.dailyChartValues());
@@ -352,6 +387,10 @@ export class App implements OnDestroy {
 
         this.api.getDailyShiftTotals(prevDate).subscribe((totals) => {
             this.previousDailyChartValues.set(totals);
+        });
+
+        this.api.getCbdSummary(date, shiftId).subscribe((data) => {
+            this.cbdSummary.set(data);
         });
     }
 
