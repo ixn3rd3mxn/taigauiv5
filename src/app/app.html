@@ -40,91 +40,12 @@
             </tui-data-list>
         </button>
         <span tuiNavigationLogo>
-            <!-- <tui-icon icon="@tui.home" /> -->
             <span tuiFade>ศูนย์รับแจ้งเหตุและสั่งการการแพทย์ฉุกเฉิน อบจ.ปัตตานี</span>
-            <!-- <div tuiBadge>pre-alpha-1.1.1</div> -->
         </span>
-        <!-- <span tuiNavigationSegments>
-            <button
-                appearance="secondary-grayscale"
-                tuiButton
-                type="button"
-            >
-                Link 1
-            </button>
-            <button
-                appearance="secondary-grayscale"
-                tuiButton
-                type="button"
-            >
-                Link 2
-            </button>
-            <button
-                appearance="secondary-grayscale"
-                tuiButton
-                tuiChevron
-                tuiDropdownAuto
-                type="button"
-                [tuiDropdown]="products"
-            >
-                <span
-                    [style.overflow]="'hidden'"
-                    [style.text-overflow]="'ellipsis'"
-                >
-                    A very very long project
-                </span>
-                <ng-template #products>
-                    <tui-data-list size="s">
-                        <button
-                            tuiOption
-                            type="button"
-                        >
-                            A very very long project
-                            <tui-icon
-                                icon="@tui.check"
-                                [style.font-size.em]="1"
-                                [style.margin-inline-start.rem]="0.5"
-                            />
-                        </button>
-                        <button
-                            tuiOption
-                            type="button"
-                        >
-                            Something else
-                        </button>
-                    </tui-data-list>
-                </ng-template>
-            </button>
-        </span> -->
         <hr />
         <span tuiNavigationLogo>
             <span tuiFade>วันเวลาปัจจุบัน {{ timeString() }} {{ shift() }} {{ dateString() }}</span>
-            <!-- <div tuiBadge>pre-alpha-1.1.1</div> -->
         </span>
-        <!-- <button
-            appearance="secondary-grayscale"
-            iconStart="@tui.plus"
-            tuiButton
-            type="button"
-        >
-            Create
-        </button>
-        <button
-            iconStart="@tui.bell"
-            tuiIconButton
-            type="button"
-        >
-            Notifications
-            <tui-badge-notification />
-        </button>
-        <button
-            iconStart="@tui.ellipsis"
-            tuiIconButton
-            type="button"
-        >
-            More
-        </button>
-        <div tuiAvatar="AI"></div> -->
     </header>
     <div [style.display]="'flex'">
         <aside
@@ -209,119 +130,7 @@
                     </ng-template>
                 </button>
             </tui-aside-group>
-            <a
-                iconStart="@tui.users"
-                tuiAsideItem
-                routerLink="/"
-            >
-                เทส
-            </a>
-            <tui-aside-group>
-                <button
-                    iconStart="@tui.settings"
-                    tuiAsideItem
-                    tuiChevron
-                    type="button"
-                >
-                    เทส
-                    <ng-template>
-                        <button
-                            tuiAsideItem
-                            type="button"
-                        >
-                            เทส
-                        </button>
-                    </ng-template>
-                </button>
-            </tui-aside-group>
-            <button
-                iconStart="@tui.heart"
-                tuiAsideItem
-                type="button"
-            >
-                <span tuiFade>เทส</span>
-            </button>
-            <button
-                iconStart="@tui.search"
-                tuiAsideItem
-                type="button"
-            >
-                เทส
-                @if (expanded()) {
-                    <div
-                        appearance="accent"
-                        tuiBadge
-                    >
-                        12
-                    </div>
-                }
-            </button>
-            <button
-                iconEnd="@tui.chevron-right"
-                iconStart="@tui.ellipsis"
-                tuiAsideItem
-                tuiDropdownAuto
-                tuiDropdownHover
-                type="button"
-                [tuiDropdown]="more"
-            >
-                เทส
-                <ng-template
-                    #more
-                    let-close
-                >
-                    <tui-data-list tuiDataListDropdownManager>
-                        <button
-                            iconStart="@tui.pencil"
-                            tuiAsideItem
-                            type="button"
-                        >
-                            เทส
-                        </button>
-                        <button
-                            iconStart="@tui.pie-chart"
-                            tuiAsideItem
-                            type="button"
-                            [tuiDropdown]="submenu"
-                        >
-                            เทส
-                            <ng-template #submenu>
-                                <tui-data-list>
-                                    <button
-                                        tuiAsideItem
-                                        type="button"
-                                        (click)="close()"
-                                    >
-                                        เทส
-                                    </button>
-                                    <button
-                                        tuiAsideItem
-                                        type="button"
-                                    >
-                                        เทส
-                                    </button>
-                                </tui-data-list>
-                            </ng-template>
-                        </button>
-                    </tui-data-list>
-                </ng-template>
-            </button>
-            <hr />
-            <button
-                iconStart="@tui.plus"
-                tuiAsideItem
-                type="button"
-            >
-                เทส
-            </button>
             <footer>
-                <button
-                    iconStart="@tui.star"
-                    tuiAsideItem
-                    type="button"
-                >
-                    เทส
-                </button>
                 <button
                     appSettings
                     iconStart="@tui.settings"
@@ -346,28 +155,6 @@
                 tuiSubheader
                 [style.position]="'sticky'"
             >
-                <!-- <tui-breadcrumbs [itemsLimit]="10">
-                    @for (item of breadcrumbs; track item) {
-                        @if ($last) {
-                            <strong
-                                *tuiItem
-                                tuiFade
-                            >
-                                {{ item }}
-                            </strong>
-                        }
-                        @if (!$last) {
-                            <button
-                                *tuiItem
-                                tuiLink
-                                type="button"
-                            >
-                                {{ item }}
-                            </button>
-                        }
-                    }
-                </tui-breadcrumbs> -->
-                
                 <tui-textfield
                     [style.width.rem]="7.04"
                     [tuiTextfieldCleaner]="false"
@@ -377,11 +164,12 @@
                         [max]="dateMax"
                         [min]="dateMin"
                         [(ngModel)]="dateValue"
+                        (ngModelChange)="onDateChange($event)"
                         (keydown)="$event.preventDefault()"
                     />
                     <tui-calendar *tuiDropdown />
                 </tui-textfield>
-                
+
                 <tui-textfield tuiChevron
                     [style.width.rem]="4.22"
                     [tuiTextfieldCleaner]="false"
@@ -389,6 +177,7 @@
                     <input
                         tuiSelect
                         [(ngModel)]="selectedShift"
+                        (ngModelChange)="onShiftChange($event)"
                     />
                     <tui-data-list-wrapper
                         *tuiDropdown
@@ -396,27 +185,6 @@
                     />
                 </tui-textfield>
 
-                <!-- <tui-tabs tuiFade>
-                    <button
-                        tuiTab
-                        type="button"
-                    >
-                        Default view
-                    </button>
-                    <button
-                        tuiTab
-                        type="button"
-                    >
-                        Details
-                    </button>
-                    <button
-                        tuiTab
-                        type="button"
-                    >
-                        Followers
-                    </button>
-                </tui-tabs> -->
-                
                 <button
                     tuiButton
                     type="button"
@@ -438,24 +206,7 @@
                     #assignStaffContent
                     let-context
                 >
-
-                    <!-- <div [style.margin-block-end.rem]="2">
-                        <tui-radio-list
-                            [itemContent]="staffSizeContent"
-                            [items]="staffSizes"
-                            [style.flex-direction]="'row'"
-                            [style.width]="'max-content'"
-                            [(ngModel)]="staffTableSize"
-                        />
-                        <ng-template
-                            #staffSizeContent
-                            let-value
-                        >
-                            {{ value === 's' ? 'เล็ก' : value === 'm' ? 'กลาง' : 'ใหญ่' }}
-                        </ng-template>
-                    </div> -->
-
-                    <search tuiSearch [style.margin-block-end.rem]="0.5">
+                    <search tuiSearch [style.margin-block-end.rem]="0.7">
                         <form [formGroup]="searchForm">
                             <fieldset tuiTextfieldSize="m">
                                 <tui-textfield iconStart="@tui.search">
@@ -465,11 +216,23 @@
                                         tuiInput
                                     />
                                 </tui-textfield>
+                                <tui-segmented size="m">
+                                    @for (seg of genderSegments; track seg) {
+                                        <label>
+                                            <input
+                                                formControlName="gender"
+                                                type="radio"
+                                                [value]="seg"
+                                            />
+                                            {{ seg ?? 'ทั้งหมด' }}
+                                        </label>
+                                    }
+                                </tui-segmented>
                             </fieldset>
                         </form>
                     </search>
 
-                    <tui-scrollbar>
+                    <tui-scrollbar class="staff-table-wrapper">
                         <cdk-virtual-scroll-viewport
                             #viewport
                             appendOnly
@@ -493,23 +256,19 @@
                                             <div
                                                 [style.display]="'flex'"
                                                 [style.justify-content]="'center'"
-                                            >
-                                                <!-- <input
-                                                    tuiCheckbox
-                                                    tuiCheckboxTable
-                                                    type="checkbox"
-                                                /> -->
-                                            </div>
+                                            ></div>
                                         </th>
                                         <th
                                             tuiTh
                                             [sticky]="true"
+                                            [style.width.rem]="20"
                                         >
-                                                <span tuiTitle>ชื่อ-สกุล</span>
+                                            <span tuiTitle>ชื่อ-สกุล</span>
                                         </th>
                                         <th
                                             tuiTh
                                             [sticky]="true"
+                                            [style.width.rem]="11"
                                         >
                                             สถานะ
                                         </th>
@@ -526,14 +285,25 @@
                                                     tuiCheckbox
                                                     type="checkbox"
                                                     [tuiCheckboxRow]="item"
+                                                    size="m"
                                                 />
                                             </div>
                                         </td>
                                         <td tuiTd>
-                                                <span tuiTitle>{{ item.name }}</span>
+                                            <span>{{ item.name }}</span>
                                         </td>
                                         <td tuiTd>
                                             <span [tuiStatus]="item.status.color">{{ item.status.value }}</span>
+                                            @if (getStaffChangeStatus(item.rescue_id); as change) {
+                                                <div
+                                                    tuiBadge
+                                                    size="l"
+                                                    [style.margin-left.rem]="0.5"
+                                                    [appearance]="change === 'add' ? 'positive' : 'negative'"
+                                                >
+                                                    {{ change === 'add' ? 'เพิ่ม' : 'ลบ' }}
+                                                </div>
+                                            }
                                         </td>
                                     </tr>
                                 </tbody>
@@ -566,107 +336,148 @@
                 >
                     <form [formGroup]="recordIncidentForm">
                         <span class="incident-label">ประเภท</span>
-                        <div
-                            tuiGroup
+                        <tui-textfield
+                            tuiChevron
                             class="incident-group"
-                            [collapsed]="true"
+                            [tuiTextfieldCleaner]="false"
+                            [style.max-width.rem]="14.31"
                         >
-                            @for (opt of incidentTypes; track opt) {
-                                <label tuiBlock>
-                                    <input
-                                        formControlName="type"
-                                        tuiRadio
-                                        type="radio"
-                                        [value]="opt"
-                                    />
-                                    {{ opt }}
-                                </label>
-                            }
-                        </div>
+                            <input
+                                tuiSelect
+                                formControlName="type"
+                                placeholder="เลือกประเภท"
+                            />
+                            <tui-data-list-wrapper
+                                *tuiDropdown
+                                [items]="incidentTypes"
+                            />
+                        </tui-textfield>
                         <tui-error
                             formControlName="type"
                             [style.margin-block-end.rem]="0.75"
                         />
 
-                        <span
-                            class="incident-label"
-                            [style.color]="incidentSubfieldsDisabled() ? 'var(--tui-border-focus)' : null"
-                        >ช่องทางการแจ้งเหตุ</span>
-                        <div
-                            tuiGroup
-                            class="incident-group"
-                            [collapsed]="true"
-                            [style.width.rem]="20"
-                        >
-                            @for (opt of incidentSubtypes; track opt) {
-                                <label tuiBlock>
-                                    <input
-                                        formControlName="subtype"
-                                        tuiRadio
-                                        type="radio"
-                                        [value]="opt"
-                                    />
-                                    {{ opt }}
-                                </label>
-                            }
+                        <div [style.display]="'flex'" [style.gap.rem]="1" [style.align-items]="'flex-start'">
+                            <div [style.flex]="1">
+                                <span
+                                    class="incident-label"
+                                    [style.color]="incidentSubfieldsDisabled() ? 'var(--tui-border-focus)' : null"
+                                >ช่องทางการแจ้งเหตุ</span>
+                                <div
+                                    tuiGroup
+                                    class="incident-group"
+                                    [collapsed]="true"
+                                    [style.width]="'100%'"
+                                    [class.invalid-group]="recordIncidentForm.get('subtype')?.invalid && recordIncidentForm.get('subtype')?.touched"
+                                >
+                                    @for (opt of incidentSubtypes; track opt) {
+                                        <label tuiBlock>
+                                            <input
+                                                formControlName="subtype"
+                                                tuiRadio
+                                                type="radio"
+                                                [value]="opt"
+                                            />
+                                            {{ opt }}
+                                        </label>
+                                    }
+                                </div>
+                                <tui-error
+                                    formControlName="subtype"
+                                    [style.margin-block-end.rem]="0.75"
+                                />
+                            </div>
+                            <div [style.flex]="1">
+                                <span
+                                    class="incident-label"
+                                    [style.color]="incidentSubfieldsDisabled() ? 'var(--tui-border-focus)' : null"
+                                >ประเภทของการเจ็บป่วย</span>
+                                <div
+                                    tuiGroup
+                                    class="incident-group"
+                                    [collapsed]="true"
+                                    [style.width]="'100%'"
+                                    [class.invalid-group]="recordIncidentForm.get('level')?.invalid && recordIncidentForm.get('level')?.touched"
+                                >
+                                    @for (opt of incidentLevels; track opt.value) {
+                                        <label tuiBlock>
+                                            <input
+                                                formControlName="level"
+                                                tuiRadio
+                                                type="radio"
+                                                [value]="opt.value"
+                                            />
+                                            {{ opt.label }}
+                                        </label>
+                                    }
+                                </div>
+                                <tui-error
+                                    formControlName="level"
+                                    [style.margin-block-end.rem]="0.75"
+                                />
+                            </div>
                         </div>
-                        <tui-error
-                            formControlName="subtype"
-                            [style.margin-block-end.rem]="0.75"
-                        />
 
-                        <span
-                            class="incident-label"
-                            [style.color]="incidentSubfieldsDisabled() ? 'var(--tui-border-focus)' : null"
-                        >ระดับความรุนแรง</span>
-                        <div
-                            tuiGroup
-                            class="incident-group"
-                            [collapsed]="true"
-                            [style.width.rem]="19"
-                        >
-                            @for (opt of incidentLevels; track opt) {
-                                <label tuiBlock>
+                        <div [style.display]="'flex'" [style.gap.rem]="1" [style.align-items]="'flex-start'">
+                            <div [style.flex]="1">
+                                <span
+                                    class="incident-label"
+                                    [style.color]="incidentSubfieldsDisabled() ? 'var(--tui-border-focus)' : null"
+                                >CBD</span>
+                                <tui-textfield
+                                    tuiChevron
+                                    tuiDropdownLimitWidth="min"
+                                    tuiDropdownDirection="bottom"
+                                    class="incident-group"
+                                    [tuiTextfieldCleaner]="false"
+                                    [style.width]="'100%'"
+                                    tuiDropdownAlign="center"
+                                >
                                     <input
-                                        formControlName="level"
-                                        tuiRadio
-                                        type="radio"
-                                        [value]="opt"
+                                        tuiSelect
+                                        formControlName="cbd_criteria"
+                                        placeholder="เลือก CBD"
                                     />
-                                    {{ opt }}
-                                </label>
-                            }
-                        </div>
-                        <tui-error
-                            formControlName="level"
-                            [style.margin-block-end.rem]="0.75"
-                        />
-
-                        <span
-                            class="incident-label"
-                            [style.color]="incidentSubfieldsDisabled() ? 'var(--tui-border-focus)' : null"
-                        >ระดับ CBD</span>
-                        <div
-                            tuiGroup
-                            class="incident-group"
-                            [collapsed]="true"
-                        >
-                            @for (opt of incidentCbdLevels; track opt) {
-                                <label tuiBlock>
+                                    <tui-data-list-wrapper
+                                        *tuiDropdown
+                                        [items]="cbdCriteriaItems()"
+                                    />
+                                </tui-textfield>
+                                <tui-error
+                                    formControlName="cbd_criteria"
+                                    [style.margin-block-end.rem]="0.75"
+                                />
+                            </div>
+                            <div [style.flex]="1">
+                                <span
+                                    class="incident-label"
+                                    [style.color]="incidentSubfieldsDisabled() ? 'var(--tui-border-focus)' : null"
+                                >ระดับความรุนแรงตาม CBD</span>
+                                <tui-textfield
+                                    tuiChevron
+                                    tuiDropdownLimitWidth="min"
+                                    tuiDropdownDirection="bottom"
+                                    class="incident-group"
+                                    [tuiTextfieldCleaner]="false"
+                                    [style.width]="'100%'"
+                                    tuiDropdownAlign="center"
+                                >
                                     <input
-                                        formControlName="cbd"
-                                        tuiRadio
-                                        type="radio"
-                                        [value]="opt"
+                                        tuiSelect
+                                        formControlName="cbd_level"
+                                        placeholder="เลือกระดับ"
                                     />
-                                    {{ opt }}
-                                </label>
-                            }
+                                    <tui-data-list-wrapper
+                                        *tuiDropdown
+                                        [items]="cbdLevelItems()"
+                                    />
+                                </tui-textfield>
+                                <tui-error
+                                    formControlName="cbd_level"
+                                    [style.margin-block-end.rem]="0.75"
+                                />
+                            </div>
                         </div>
-                        <tui-error
-                            formControlName="cbd"
-                            [style.margin-block-end.rem]="0.75"
-                        />
                     </form>
 
                     <footer>
@@ -692,9 +503,8 @@
                             [style.font]="'var(--tui-typography-heading-h1)'"
                         >
                             <span tuiSubtitle>ผลรวมทั้งหมดต่อเวร</span>
-                            999
+                            {{ summary()?.total ?? 0 }}
                         </h1>
-
                         <aside tuiAccessories>
                             <div
                                 appearance="primary"
@@ -702,15 +512,48 @@
                             ></div>
                         </aside>
                     </header>
-
                     <footer>
-                        <div
-                            tuiBadge
-                            class="badge-up"
+                        @if (summaryDiff(); as diff) {
+                            <div
+                                tuiBadge
+                                [class]="badgeClass(diff.total)"
+                            >
+                                {{ diffLabelShift(diff.total) }}
+                                <tui-icon [icon]="badgeIcon(diff.total)" />
+                            </div>
+                        }
+                    </footer>
+                </div>
+                <div
+                    appearance="floating"
+                    tuiCardLarge
+                    class="stat-card"
+                >
+                    <header tuiHeader>
+                        <h1
+                            tuiTitle
+                            [style.font]="'var(--tui-typography-heading-h1)'"
                         >
-                            88 เคส
-                            <tui-icon icon="@tui.arrow-up" />
-                        </div>
+                            <span tuiSubtitle>แจ้งเพิ่มเติม เหตุเดียวกัน</span>
+                            {{ summary()?.['แจ้งเพิ่มเติม เหตุเดียวกัน'] ?? 0 }}
+                        </h1>
+                        <aside tuiAccessories>
+                            <div
+                                appearance="primary"
+                                tuiAvatar="@tui.message-circle-plus"
+                            ></div>
+                        </aside>
+                    </header>
+                    <footer>
+                        @if (summaryDiff(); as diff) {
+                            <div
+                                tuiBadge
+                                [class]="badgeClass(diff.additional)"
+                            >
+                                {{ diffLabelShiftSimple(diff.additional) }}
+                                <tui-icon [icon]="badgeIcon(diff.additional)" />
+                            </div>
+                        }
                     </footer>
                 </div>
                 <div
@@ -724,9 +567,8 @@
                             [style.font]="'var(--tui-typography-heading-h1)'"
                         >
                             <span tuiSubtitle>ปรึกษา</span>
-                            77
+                            {{ summary()?.['ปรึกษา'] ?? 0 }}
                         </h1>
-
                         <aside tuiAccessories>
                             <div
                                 appearance="primary"
@@ -734,15 +576,16 @@
                             ></div>
                         </aside>
                     </header>
-
                     <footer>
-                        <div
-                            tuiBadge
-                            class="badge-down"
-                        >
-                            66 เคส
-                            <tui-icon icon="@tui.arrow-down" />
-                        </div>
+                        @if (summaryDiff(); as diff) {
+                            <div
+                                tuiBadge
+                                [class]="badgeClass(diff.consult)"
+                            >
+                                {{ diffLabelShiftSimple(diff.consult) }}
+                                <tui-icon [icon]="badgeIcon(diff.consult)" />
+                            </div>
+                        }
                     </footer>
                 </div>
                 <div
@@ -756,9 +599,8 @@
                             [style.font]="'var(--tui-typography-heading-h1)'"
                         >
                             <span tuiSubtitle>สายหลุด</span>
-                            55
+                            {{ summary()?.['สายหลุด'] ?? 0 }}
                         </h1>
-
                         <aside tuiAccessories>
                             <div
                                 appearance="primary"
@@ -766,18 +608,18 @@
                             ></div>
                         </aside>
                     </header>
-
                     <footer>
-                        <div
-                            tuiBadge
-                            class="badge-up"
-                        >
-                            44 เคส
-                            <tui-icon icon="@tui.arrow-up" />
-                        </div>
+                        @if (summaryDiff(); as diff) {
+                            <div
+                                tuiBadge
+                                [class]="badgeClass(diff.dropped)"
+                            >
+                                {{ diffLabelShiftSimple(diff.dropped) }}
+                                <tui-icon [icon]="badgeIcon(diff.dropped)" />
+                            </div>
+                        }
                     </footer>
                 </div>
-                
                 <div
                     appearance="floating"
                     tuiCardLarge
@@ -789,9 +631,8 @@
                             [style.font]="'var(--tui-typography-heading-h1)'"
                         >
                             <span tuiSubtitle>ก่อกวน</span>
-                            33
+                            {{ summary()?.['ก่อกวน'] ?? 0 }}
                         </h1>
-
                         <aside tuiAccessories>
                             <div
                                 appearance="primary"
@@ -799,19 +640,20 @@
                             ></div>
                         </aside>
                     </header>
-
                     <footer>
-                        <div
-                            tuiBadge
-                            class="badge-equal"
-                        >
-                            เคสเท่ากัน
-                            <tui-icon icon="@tui.target" />
-                        </div>
+                        @if (summaryDiff(); as diff) {
+                            <div
+                                tuiBadge
+                                [class]="badgeClass(diff.nuisance)"
+                            >
+                                {{ diffLabelShiftSimple(diff.nuisance) }}
+                                <tui-icon [icon]="badgeIcon(diff.nuisance)" />
+                            </div>
+                        }
                     </footer>
                 </div>
             </div>
-            
+
             <div style="display: flex; gap: 1rem; justify-content: center;">
                 <div
                     appearance="floating"
@@ -824,7 +666,7 @@
                             [style.font]="'var(--tui-typography-heading-h1)'"
                         >
                             <span tuiSubtitle>แจ้งเหตุ</span>
-                            11
+                            {{ incidentCounts().total }}
                         </h1>
                         <aside tuiAccessories>
                             <div
@@ -837,44 +679,46 @@
                     <section class="actions">
                         <div tuiCell="l">
                             <div tuiTitle [style.font]="'var(--tui-typography-heading-h5)'">
-                                99
+                                {{ incidentCounts().c1669 }}
                                 <div tuiSubtitle>1669</div>
                             </div>
                         </div>
                         <div tuiCell="l">
                             <div tuiTitle [style.font]="'var(--tui-typography-heading-h5)'">
-                                66
+                                {{ incidentCounts().c2nd }}
                                 <div tuiSubtitle>2nd</div>
                             </div>
                         </div>
                         <div tuiCell="l">
                             <div tuiTitle [style.font]="'var(--tui-typography-heading-h5)'">
-                                88
+                                {{ incidentCounts().radio }}
                                 <div tuiSubtitle>วิทยุ</div>
                             </div>
                         </div>
                         <div tuiCell="l">
                             <div tuiTitle [style.font]="'var(--tui-typography-heading-h5)'">
-                                55
+                                {{ incidentCounts().trauma }}
                                 <div tuiSubtitle>Trauma</div>
                             </div>
                         </div>
                         <div tuiCell="l">
                             <div tuiTitle [style.font]="'var(--tui-typography-heading-h5)'">
-                                77
-                                <div tuiSubtitle>NonTrauma</div>
+                                {{ incidentCounts().nonTrauma }}
+                                <div tuiSubtitle>Non-Trauma</div>
                             </div>
                         </div>
                     </section>
 
                     <footer>
-                        <div
-                            tuiBadge
-                            class="badge-up"
-                        >
-                            00 เคส มากกว่าเวรเช้าที่ผ่านมา
-                            <tui-icon icon="@tui.arrow-up" />
-                        </div>
+                        @if (summaryDiff(); as diff) {
+                            <div
+                                tuiBadge
+                                [class]="badgeClass(diff.incident)"
+                            >
+                                {{ diffLabelShiftSimple(diff.incident) }}
+                                <tui-icon [icon]="badgeIcon(diff.incident)" />
+                            </div>
+                        }
                     </footer>
                 </div>
 
@@ -899,11 +743,10 @@
                     </header>
                     <div class="ring-chart-wrapper">
                         <tui-ring-chart
-                            [value]="chartValue"
+                            [value]="chartValue()"
                             [(activeItemIndex)]="chartActiveItemIndex"
                         >
-                            <span [style.font]="'var(--tui-typography-heading-h3)'">{{ chartSum | tuiAmount: '' }}</span>
-                            <!-- <div>รวม</div> -->
+                            <span [style.font]="'var(--tui-typography-heading-h3)'">{{ chartSum() | tuiAmount: '' }}</span>
                         </tui-ring-chart>
                         <div class="ring-chart-legend">
                             @for (label of chartLabels; track label) {
@@ -915,7 +758,7 @@
                                     [text]="label"
                                     (tuiHoveredChange)="onChartHover($index, $event)"
                                 >
-                                    <span>{{ (chartValue[$index] || 0) | tuiAmount: '' }}</span>
+                                    <span>{{ (chartValue()[$index] || 0) | tuiAmount: '' }}</span>
                                 </tui-legend-item>
                             }
                         </div>
@@ -924,10 +767,10 @@
                     <footer>
                         <div
                             tuiBadge
-                            class="badge-down"
+                            [class]="badgeClass(dailyChartDiff())"
                         >
-                            00 เคส น้อยกว่าวันที่ผ่านมา
-                            <tui-icon icon="@tui.arrow-down" />
+                            {{ diffLabelDaily(dailyChartDiff()) }}
+                            <tui-icon [icon]="badgeIcon(dailyChartDiff())" />
                         </div>
                     </footer>
                 </div>
@@ -969,4 +812,26 @@
             </div>
         </main>
     </div>
+
+    <ng-template #saveConfirmTpl>
+        @if (savePreview(); as preview) {
+            @if (preview.added.length > 0) {
+                &nbsp;&nbsp;<span [tuiStatus]="'var(--tui-status-positive)'">เพิ่ม</span>
+                @for (staff of preview.added; track staff.rescue_id) {
+                    <div>&nbsp;&nbsp;- {{ staff.name }}</div>
+                }
+            }
+            @if (preview.removed.length > 0) {
+                <div [style.margin-block-start]="preview.added.length > 0 ? '1rem' : null">
+                    &nbsp;&nbsp;<span [tuiStatus]="'var(--tui-status-negative)'">ลบ</span>
+                    @for (staff of preview.removed; track staff.rescue_id) {
+                        <div>&nbsp;&nbsp;- {{ staff.name }}</div>
+                    }
+                </div>
+            }
+            @if (preview.added.length === 0 && preview.removed.length === 0) {
+                <span>ไม่มีการเปลี่ยนแปลงจากสถานะปัจจุบัน</span>
+            }
+        }
+    </ng-template>
 </tui-root>

@@ -8,6 +8,8 @@ from libs.configs import (
     shiftwork_collection,
     incident_collection,
     shift_assignment_collection,
+    cbdcriteria_collection,
+    cbdlevel_collection,
 )
 from libs.models import Incident, ShiftAssignment
 
@@ -48,6 +50,18 @@ def get_rescue():
     return data
 
 
+@app.get("/cbdcriteria")
+def get_cbdcriteria():
+    data = list(cbdcriteria_collection.find({}, {"_id": 0}).sort("cbdcriteria_id", 1))
+    return data
+
+
+@app.get("/cbdlevel")
+def get_cbdlevel():
+    data = list(cbdlevel_collection.find({}, {"_id": 0}).sort("cbdlevel_id", 1))
+    return data
+
+
 @app.get("/shiftwork")
 def get_shiftwork():
     data = list(shiftwork_collection.find({}, {"_id": 0}))
@@ -83,6 +97,7 @@ def get_incident_summary(
             "trauma": 0,
             "non_trauma": 0,
         },
+        "แจ้งเพิ่มเติม เหตุเดียวกัน": 0,
         "ปรึกษา": 0,
         "สายหลุด": 0,
         "ก่อกวน": 0,
@@ -100,6 +115,8 @@ def get_incident_summary(
                 summary["แจ้งเหตุ"]["trauma"] += 1
             elif level == "non-trauma":
                 summary["แจ้งเหตุ"]["non_trauma"] += 1
+        elif t == "แจ้งเพิ่มเติม เหตุเดียวกัน":
+            summary["แจ้งเพิ่มเติม เหตุเดียวกัน"] += 1
         elif t == "ปรึกษา":
             summary["ปรึกษา"] += 1
         elif t == "สายหลุด":

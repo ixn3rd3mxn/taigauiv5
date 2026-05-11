@@ -18,6 +18,8 @@ class Incident(BaseModel):
     type: str  # แจ้งเหตุ, ปรึกษา, สายหลุด, ก่อกวน
     subtype: Optional[str] = None  # 1669, 2nd, วิทยุ
     level: Optional[str] = None  # trauma, non-trauma
+    cbd_criteria: Optional[str] = None
+    cbd_level: Optional[str] = None
 
 
 class ShiftAssignment(BaseModel):

@@ -5,19 +5,22 @@ import {
     CdkVirtualScrollViewport,
 } from '@angular/cdk/scrolling';
 import {toSignal} from '@angular/core/rxjs-interop';
-import {TuiAutoFocus, TuiHovered, TuiPlatform, tuiSum} from '@taiga-ui/cdk';
-import {map, startWith} from 'rxjs';
+import {TuiAutoFocus, TuiHovered, TuiPlatform} from '@taiga-ui/cdk';
+import {startWith} from 'rxjs';
 import {TuiResponsiveDialogService} from '@taiga-ui/addon-mobile';
 import {TuiTable, TuiTableControl} from '@taiga-ui/addon-table';
 import {type PolymorpheusContent} from '@taiga-ui/polymorpheus';
 import {
     ChangeDetectionStrategy,
+    ChangeDetectorRef,
     Component,
     computed,
     inject,
     OnDestroy,
     PLATFORM_ID,
     signal,
+    TemplateRef,
+    ViewChild,
 } from '@angular/core';
 import {
     FormControl,
@@ -69,13 +72,13 @@ import {
     TuiSwitch,
     TuiTabs,
     TuiBreadcrumbs,
+    TuiSegmented,
     TUI_CONFIRM,
     type TuiConfirmData,
 } from '@taiga-ui/kit';
 import {TuiCardLarge, TuiForm, TuiHeader, TuiNavigation, TuiSearch} from '@taiga-ui/layout';
 import {SettingsComponent} from './settings/settings.component';
-import {RescueService} from './services/rescue.service';
-import {ShiftAssignmentService} from './services/shift-assignment.service';
+import {ApiService, type IncidentSummary, type RescueMember} from './services/api.service';
 import {TuiLegendItem, TuiRingChart} from '@taiga-ui/addon-charts';
 import {TuiAmountPipe} from '@taiga-ui/addon-commerce';
 
@@ -94,13 +97,37 @@ const MONTHS = [
 const radioRequired: ValidatorFn = (control) =>
     control.value !== false && control.value !== null ? null : {required: true};
 
-function getShift(date: Date): string {
-    const h = date.getHours();
-    const m = date.getMinutes();
-    const total = h * 60 + m;
+function getCurrentShiftName(): string {
+    const now = new Date();
+    const total = now.getHours() * 60 + now.getMinutes();
     if (total >= 8 * 60 + 30 && total < 16 * 60 + 30) return 'เช้า';
     if (total >= 16 * 60 + 30 || total < 30) return 'บ่าย';
     return 'ดึก';
+}
+
+// For 00:00–00:30 (tail of บ่าย shift), the "date" belongs to the previous calendar day
+function getInitialDateValue(): TuiDay {
+    const now = new Date();
+    const total = now.getHours() * 60 + now.getMinutes();
+    if (total < 30) {
+        const d = new Date();
+        d.setDate(d.getDate() - 1);
+        return new TuiDay(d.getFullYear(), d.getMonth(), d.getDate());
+    }
+    return TuiDay.currentLocal();
+}
+
+function msUntilNextShiftBoundary(): number {
+    const now = new Date();
+    const nowMs =
+        (now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds()) * 1000 +
+        now.getMilliseconds();
+    const dayMs = 24 * 60 * 60 * 1000;
+    for (const minBoundary of [30, 510, 990]) {
+        const boundaryMs = minBoundary * 60 * 1000;
+        if (boundaryMs > nowMs) return boundaryMs - nowMs;
+    }
+    return dayMs - nowMs + 30 * 60 * 1000;
 }
 
 @Component({
@@ -153,18 +180,14 @@ function getShift(date: Date): string {
         TuiTextfield,
         TuiTitle,
         TuiBreadcrumbs,
-        TuiInput,
         TuiLink,
         TuiLabel,
-        TuiAmountPipe,
-        TuiHovered,
-        TuiLegendItem,
-        TuiRingChart,
         TuiBlock,
         TuiError,
         TuiGroup,
         TuiRadio,
         TuiSearch,
+        TuiSegmented,
         SettingsComponent,
     ],
     templateUrl: './app.html',
@@ -196,10 +219,15 @@ export class App implements OnDestroy {
     private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
     private readonly confirm = inject(TuiConfirmService);
     private readonly dialogs = inject(TuiDialogService);
-    private readonly rescueService = inject(RescueService);
-    private readonly shiftAssignmentService = inject(ShiftAssignmentService);
+    private readonly api = inject(ApiService);
+    private readonly cdr = inject(ChangeDetectorRef);
     private readonly now = signal(new Date());
     private readonly intervalId: ReturnType<typeof setInterval> | null = null;
+    private shiftCheckTimer: ReturnType<typeof setTimeout> | null = null;
+    private eventSource: EventSource | null = null;
+    private mainReady = false;
+    private staffDialogIsOpen = false;
+    private staffDialogBaseIds: number[] = [];
 
     protected readonly timeString = computed(() =>
         this.now().toLocaleTimeString('th-TH', {hour12: false}),
@@ -214,26 +242,56 @@ export class App implements OnDestroy {
         return `วัน${day}ที่ ${date} ${month} ${year}`;
     });
 
-    protected readonly shift = computed(() => `เวร${getShift(this.now())}`);
+    protected readonly shift = computed(() => `เวร${getCurrentShiftName()}`);
 
-    constructor() {
-        if (this.isBrowser) {
-            this.intervalId = setInterval(() => this.now.set(new Date()), 1000);
-            this.shiftAssignmentService
-                .get(this.getDateString(), this.getShiftId())
-                .subscribe((a) => this.assignedRescueIds.set(a.rescue_ids));
-        }
-    }
+    // ── Summary data ─────────────────────────────────────────────────────────
+    protected readonly summary = signal<IncidentSummary | null>(null);
+    protected readonly previousSummary = signal<IncidentSummary | null>(null);
+    protected readonly dailyChartValues = signal<number[]>([0, 0, 0]);
+    protected readonly previousDailyChartValues = signal<number[]>([0, 0, 0]);
 
-    ngOnDestroy(): void {
-        if (this.intervalId !== null) clearInterval(this.intervalId);
-    }
+    protected readonly summaryDiff = computed(() => {
+        const cur = this.summary();
+        const prev = this.previousSummary();
+        if (!cur || !prev) return null;
+        return {
+            total: cur.total - prev.total,
+            incident: cur['แจ้งเหตุ'].total - prev['แจ้งเหตุ'].total,
+            additional: cur['แจ้งเพิ่มเติม เหตุเดียวกัน'] - prev['แจ้งเพิ่มเติม เหตุเดียวกัน'],
+            consult: cur['ปรึกษา'] - prev['ปรึกษา'],
+            dropped: cur['สายหลุด'] - prev['สายหลุด'],
+            nuisance: cur['ก่อกวน'] - prev['ก่อกวน'],
+        };
+    });
 
+    protected readonly incidentCounts = computed(() => {
+        const s = this.summary();
+        return {
+            total: s?.['แจ้งเหตุ'].total ?? 0,
+            c1669: s?.['แจ้งเหตุ']['1669'] ?? 0,
+            c2nd: s?.['แจ้งเหตุ']['2nd'] ?? 0,
+            radio: s?.['แจ้งเหตุ']['วิทยุ'] ?? 0,
+            trauma: s?.['แจ้งเหตุ'].trauma ?? 0,
+            nonTrauma: s?.['แจ้งเหตุ'].non_trauma ?? 0,
+        };
+    });
+
+    protected readonly chartValue = computed(() => this.dailyChartValues());
+    protected readonly chartSum = computed(() =>
+        this.dailyChartValues().reduce((a, b) => a + b, 0),
+    );
+    protected readonly dailyChartDiff = computed(
+        () =>
+            this.dailyChartValues().reduce((a, b) => a + b, 0) -
+            this.previousDailyChartValues().reduce((a, b) => a + b, 0),
+    );
+
+    // ── Date / shift controls ─────────────────────────────────────────────────
     protected readonly dateMin = new TuiDay(2026, 2, 16);
     protected readonly dateMax = new TuiDay(2031, 11, 31);
-    protected dateValue = TuiDay.currentLocal();
-    protected readonly shifts = ['เช้า', 'บ่าย', 'ดึก'];
-    protected selectedShift: string | null = getShift(new Date());
+    protected dateValue = getInitialDateValue();
+    protected readonly shifts = ['ดึก', 'เช้า', 'บ่าย'];
+    protected selectedShift: string | null = getCurrentShiftName();
 
     protected readonly expanded = signal(false);
     protected open = false;
@@ -255,65 +313,35 @@ export class App implements OnDestroy {
     };
 
     protected chartActiveItemIndex = Number.NaN;
-    protected readonly chartValue = [99, 88, 77];
-    protected readonly chartSum = tuiSum(...this.chartValue);
-    protected readonly chartLabels = ['เช้า', 'บ่าย', 'ดึก'];
+    protected readonly chartLabels = ['ดึก', 'เช้า', 'บ่าย'];
 
-    protected isChartItemActive(index: number): boolean {
-        return this.chartActiveItemIndex === index;
+    constructor() {
+        if (this.isBrowser) {
+            this.intervalId = setInterval(() => this.now.set(new Date()), 1000);
+            this.loadSummary();
+            this.scheduleShiftCheck();
+
+            this.eventSource = this.api.subscribeToEvents();
+            this.eventSource.addEventListener('incident_created', () => {
+                this.loadSummary();
+            });
+            this.eventSource.addEventListener('staff_updated', () => {
+                if (this.staffDialogIsOpen) {
+                    this.pollDialogState();
+                } else {
+                    this.loadStaffAssignment();
+                }
+            });
+        }
     }
 
-    protected onChartHover(index: number, hovered: boolean): void {
-        this.chartActiveItemIndex = hovered ? index : Number.NaN;
+    ngOnDestroy(): void {
+        if (this.intervalId !== null) clearInterval(this.intervalId);
+        if (this.shiftCheckTimer !== null) clearTimeout(this.shiftCheckTimer);
+        this.eventSource?.close();
     }
 
-    protected handleToggle(): void {
-        this.expanded.update((e) => !e);
-    }
-
-    protected resetToToday(): void {
-        this.dateValue = TuiDay.currentLocal();
-        this.selectedShift = getShift(new Date());
-    }
-
-    protected readonly staffSizes = ['l', 'm', 's'] as const;
-    protected staffSelected: StaffItem[] = [];
-
-    protected readonly searchForm = new FormGroup({
-        search: new FormControl(''),
-    });
-
-    private readonly searchValue = toSignal(
-        this.searchForm.controls.search.valueChanges.pipe(startWith('')),
-        {initialValue: ''},
-    );
-
-    protected readonly staffData = toSignal(
-        this.rescueService.getAll().pipe(
-            map((list): StaffItem[] =>
-                list.map((r) => ({
-                    rescue_id: r.rescue_id,
-                    name: r.rescue_name,
-                    status: {value: 'ว่าง', color: 'var(--tui-status-positive)'},
-                })),
-            ),
-        ),
-        {initialValue: [] as StaffItem[]},
-    );
-
-    protected readonly filteredStaffData = computed(() => {
-        const q = (this.searchValue() ?? '').toLowerCase();
-        if (!q) return this.staffData();
-        return this.staffData().filter((item) => item.name.toLowerCase().includes(q));
-    });
-
-    protected readonly assignedRescueIds = signal<number[]>([]);
-
-    protected readonly assignedStaff = computed(() =>
-        this.staffData().filter((s) => this.assignedRescueIds().includes(s.rescue_id)),
-    );
-
-    private initialStaffSelected: StaffItem[] = [];
+    // ── Date/shift helpers ────────────────────────────────────────────────────
 
     private getDateString(): string {
         const d = this.dateValue;
@@ -325,26 +353,283 @@ export class App implements OnDestroy {
         return ids[this.selectedShift ?? 'เช้า'] ?? 1;
     }
 
+    // ดึก (shift_id=3) assignment is stored against the previous calendar day
+    private getAssignmentDate(): string {
+        if (this.getShiftId() !== 3) return this.getDateString();
+        const d = new Date(`${this.getDateString()}T12:00:00`);
+        d.setDate(d.getDate() - 1);
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    }
+
+    private getPreviousDateString(): string {
+        const d = new Date(`${this.getDateString()}T12:00:00`);
+        d.setDate(d.getDate() - 1);
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    }
+
+    private scheduleShiftCheck(): void {
+        this.shiftCheckTimer = setTimeout(() => {
+            const newShift = getCurrentShiftName();
+            this.selectedShift = newShift;
+            this.dateValue = getInitialDateValue();
+            this.mainReady = false;
+            this.loadSummary();
+            this.scheduleShiftCheck();
+            this.cdr.markForCheck();
+        }, msUntilNextShiftBoundary() + 100);
+    }
+
+    // ── Data loading ──────────────────────────────────────────────────────────
+
+    private loadSummary(): void {
+        const date = this.getDateString();
+        const shiftId = this.getShiftId();
+        const prevDate = this.getPreviousDateString();
+
+        this.api.getIncidentSummary(date, shiftId).subscribe((data) => {
+            this.summary.set(data);
+        });
+
+        this.api.getIncidentSummary(prevDate, shiftId).subscribe((data) => {
+            this.previousSummary.set(data);
+        });
+
+        this.api.getDailyShiftTotals(date).subscribe((totals) => {
+            this.dailyChartValues.set(totals);
+        });
+
+        this.api.getDailyShiftTotals(prevDate).subscribe((totals) => {
+            this.previousDailyChartValues.set(totals);
+        });
+
+        this.loadStaffAssignment();
+    }
+
+    private loadStaffAssignment(): void {
+        this.api
+            .getShiftAssignment(this.getAssignmentDate(), this.getShiftId())
+            .subscribe((result) => {
+                const ids: number[] = result.rescue_ids ?? [];
+                if (this.mainReady && !this.staffDialogIsOpen) {
+                    this.assignedRescueIds.set(ids);
+                } else if (!this.mainReady) {
+                    this.assignedRescueIds.set(ids);
+                    this.mainReady = true;
+                }
+            });
+    }
+
+    private pollDialogState(): void {
+        this.api
+            .getShiftAssignment(this.getAssignmentDate(), this.getShiftId())
+            .subscribe((result) => {
+                const latestIds: number[] = result.rescue_ids ?? [];
+                const base = this.staffDialogBaseIds;
+
+                // Detect what changed externally
+                const externalAdded = latestIds.filter((id) => !base.includes(id));
+                const externalRemoved = base.filter((id) => !latestIds.includes(id));
+
+                // Merge: keep user's pending adds/removes on top of latest server state
+                const userAdded = this.staffSelected
+                    .map((s) => s.rescue_id)
+                    .filter((id) => !base.includes(id));
+                const userRemovedSet = new Set(
+                    base.filter(
+                        (id) => !this.staffSelected.some((s) => s.rescue_id === id),
+                    ),
+                );
+
+                const newIds = [
+                    ...latestIds.filter((id) => !userRemovedSet.has(id)),
+                    ...userAdded.filter((id) => !latestIds.includes(id)),
+                ];
+
+                this.staffDialogBaseIds = latestIds;
+                this.assignedRescueIds.set(latestIds);
+                const allStaff = this.staffData();
+                this.staffSelected = allStaff.filter((s) => newIds.includes(s.rescue_id));
+                this.initialStaffSelected = allStaff.filter((s) => latestIds.includes(s.rescue_id));
+                this.cdr.markForCheck();
+
+                // Mark dirty if still has user changes
+                const isDirty = !this.isSameStaffSelection(
+                    this.staffSelected,
+                    allStaff.filter((s) => latestIds.includes(s.rescue_id)),
+                );
+                if (isDirty) {
+                    this.confirm.markAsDirty();
+                } else {
+                    this.confirm.markAsPristine();
+                }
+
+                if (externalAdded.length > 0 || externalRemoved.length > 0) {
+                    // Notify user of external change via dirty state visual
+                    this.cdr.markForCheck();
+                }
+            });
+    }
+
+    protected handleToggle(): void {
+        this.expanded.update((e) => !e);
+    }
+
+    protected resetToToday(): void {
+        this.dateValue = getInitialDateValue();
+        this.selectedShift = getCurrentShiftName();
+        this.mainReady = false;
+        this.loadSummary();
+    }
+
+    protected onDateChange(day: TuiDay | null): void {
+        if (day) {
+            this.mainReady = false;
+            this.loadSummary();
+        }
+    }
+
+    protected onShiftChange(_shift: string | null): void {
+        this.mainReady = false;
+        this.loadSummary();
+    }
+
+    // ── Badge helpers ─────────────────────────────────────────────────────────
+
+    protected badgeClass(diff: number): string {
+        if (diff > 0) return 'badge-up';
+        if (diff < 0) return 'badge-down';
+        return 'badge-equal';
+    }
+
+    protected badgeIcon(diff: number): string {
+        if (diff > 0) return '@tui.arrow-up';
+        if (diff < 0) return '@tui.arrow-down';
+        return '@tui.target';
+    }
+
+    protected diffLabel(diff: number): string {
+        if (diff > 0) return `+${diff} เคส มากกว่าเวรที่ผ่านมา`;
+        if (diff < 0) return `${diff} เคส น้อยกว่าเวรที่ผ่านมา`;
+        return 'เท่ากับเวรที่ผ่านมา';
+    }
+
+    protected diffLabelShift(diff: number): string {
+        const shift = this.selectedShift ?? 'เช้า';
+        if (diff > 0) return `${diff} เคส มากกว่าเวร${shift}ที่ผ่านมา`;
+        if (diff < 0) return `${Math.abs(diff)} เคส น้อยกว่าเวร${shift}ที่ผ่านมา`;
+        return `เท่ากับเวร${shift}ที่ผ่านมา`;
+    }
+
+    protected diffLabelShiftSimple(diff: number): string {
+        const shift = this.selectedShift ?? 'เช้า';
+        if (diff !== 0) return `${Math.abs(diff)} เคส`;
+        return `เท่ากับเวร${shift}ที่ผ่านมา`;
+    }
+
+    protected diffLabelDaily(diff: number): string {
+        if (diff > 0) return `${diff} เคส มากกว่าวันที่ผ่านมา`;
+        if (diff < 0) return `${Math.abs(diff)} เคส น้อยกว่าวันที่ผ่านมา`;
+        return 'เท่ากับวันที่ผ่านมา';
+    }
+
+    // ── Chart helpers ─────────────────────────────────────────────────────────
+
+    protected isChartItemActive(index: number): boolean {
+        return this.chartActiveItemIndex === index;
+    }
+
+    protected onChartHover(index: number, hovered: boolean): void {
+        this.chartActiveItemIndex = hovered ? index : Number.NaN;
+    }
+
+    // ── Staff dialog ──────────────────────────────────────────────────────────
+
+    protected readonly staffSizes = ['l', 'm', 's'] as const;
+    protected staffSelected: StaffItem[] = [];
+
+    protected readonly genderSegments = [null, 'ชาย', 'หญิง'] as const;
+
+    protected readonly searchForm = new FormGroup({
+        search: new FormControl(''),
+        gender: new FormControl<string | null>(null),
+    });
+
+    private readonly searchValue = toSignal(
+        this.searchForm.controls.search.valueChanges.pipe(startWith('')),
+        {initialValue: ''},
+    );
+
+    private readonly genderValue = toSignal(
+        this.searchForm.controls.gender.valueChanges.pipe(startWith(null)),
+        {initialValue: null as string | null},
+    );
+
+    private readonly rawRescuers = toSignal(
+        this.api.getRescuers(),
+        {initialValue: [] as RescueMember[]},
+    );
+
+    protected readonly staffData = computed((): StaffItem[] =>
+        this.rawRescuers().map((r) => ({
+            rescue_id: r.rescue_id,
+            name: r.rescue_name,
+            status: this.assignedRescueIds().includes(r.rescue_id)
+                ? {value: 'ประจำการ', color: 'var(--tui-status-negative)'}
+                : {value: 'ว่าง', color: 'var(--tui-status-positive)'},
+        })),
+    );
+
+    protected readonly filteredStaffData = computed(() => {
+        const q = (this.searchValue() ?? '').toLowerCase();
+        const gender = this.genderValue();
+        let data = this.staffData();
+        if (q) data = data.filter((item) => item.name.toLowerCase().includes(q));
+        if (gender === 'ชาย') data = data.filter((item) => item.name.startsWith('นาย'));
+        if (gender === 'หญิง') data = data.filter((item) => item.name.startsWith('นาง'));
+        return data;
+    });
+
+    protected readonly assignedRescueIds = signal<number[]>([]);
+
+    protected readonly assignedStaff = computed(() =>
+        this.staffData().filter((s) => this.assignedRescueIds().includes(s.rescue_id)),
+    );
+
+    @ViewChild('saveConfirmTpl') private readonly saveConfirmTpl!: TemplateRef<unknown>;
+    protected readonly savePreview = signal<{added: StaffItem[]; removed: StaffItem[]} | null>(null);
+
+    private initialStaffSelected: StaffItem[] = [];
+
+    protected getStaffChangeStatus(rescueId: number): 'add' | 'remove' | null {
+        const inBase = this.staffDialogBaseIds.includes(rescueId);
+        const isSelected = this.staffSelected.some((s) => s.rescue_id === rescueId);
+        if (isSelected && !inBase) return 'add';
+        if (!isSelected && inBase) return 'remove';
+        return null;
+    }
+
     protected onStaffSelectionChange(value: StaffItem[]): void {
         this.staffSelected = value;
         const isDirty = !this.isSameStaffSelection(this.staffSelected, this.initialStaffSelected);
-
         if (isDirty) {
             this.confirm.markAsDirty();
         } else {
             this.confirm.markAsPristine();
         }
+        this.cdr.markForCheck();
     }
 
     protected onAssignStaffClick(content: PolymorpheusContent): void {
         this.searchForm.reset();
-        this.shiftAssignmentService
-            .get(this.getDateString(), this.getShiftId())
+        this.api
+            .getShiftAssignment(this.getAssignmentDate(), this.getShiftId())
             .subscribe((assignment) => {
+                const ids = assignment.rescue_ids ?? [];
                 this.staffSelected = this.staffData().filter((s) =>
-                    assignment.rescue_ids.includes(s.rescue_id),
+                    ids.includes(s.rescue_id),
                 );
                 this.initialStaffSelected = [...this.staffSelected];
+                this.staffDialogBaseIds = ids;
                 this.confirm.markAsPristine();
 
                 const closable = this.confirm.withConfirm({
@@ -352,14 +637,17 @@ export class App implements OnDestroy {
                     data: {content: 'การเลือกจะ<strong>ไม่ถูกบันทึก</strong>'},
                 });
 
+                this.staffDialogIsOpen = true;
                 this.dialogs
                     .open(content, {label: 'กำหนดเจ้าหน้าที่', closable, dismissible: closable, size: 'm'})
                     .subscribe({
                         complete: () => {
+                            this.staffDialogIsOpen = false;
                             this.initialStaffSelected = [...this.staffSelected];
                             this.confirm.markAsPristine();
                         },
                         error: () => {
+                            this.staffDialogIsOpen = false;
                             this.staffSelected = [...this.initialStaffSelected];
                             this.confirm.markAsPristine();
                         },
@@ -368,8 +656,20 @@ export class App implements OnDestroy {
     }
 
     protected onSaveConfirm(outerContext: {complete: () => void}): void {
+        const selectedIds = this.staffSelected.map((s) => s.rescue_id);
+        const baseSet = new Set(this.staffDialogBaseIds);
+        const userRemovedSet = new Set(
+            this.staffDialogBaseIds.filter((id) => !selectedIds.includes(id)),
+        );
+        const userAdded = selectedIds.filter((id) => !baseSet.has(id));
+
+        const addedStaff = this.staffSelected.filter((s) => !baseSet.has(s.rescue_id));
+        const removedStaff = this.staffData().filter((s) => userRemovedSet.has(s.rescue_id));
+
+        this.savePreview.set({added: addedStaff, removed: removedStaff});
+
         const confirmData: TuiConfirmData = {
-            content: 'ข้อมูลที่เลือกจะ<strong>ถูกบันทึก</strong>',
+            content: this.saveConfirmTpl,
             yes: 'ยืนยัน',
             no: 'ยกเลิก',
         };
@@ -383,31 +683,60 @@ export class App implements OnDestroy {
             .subscribe({
                 next: (confirmed) => {
                     if (!confirmed) return;
-                    const rescueIds = this.staffSelected.map((s) => s.rescue_id);
-                    this.shiftAssignmentService
-                        .save({
-                            date: this.getDateString(),
-                            shift_id: this.getShiftId(),
-                            rescue_ids: rescueIds,
-                        })
-                        .subscribe(() => {
-                            this.assignedRescueIds.set(rescueIds);
-                            outerContext.complete();
+
+                    // Merge with latest server state to handle concurrent edits
+                    this.api
+                        .getShiftAssignment(this.getAssignmentDate(), this.getShiftId())
+                        .subscribe((latest) => {
+                            const mergedIds = [
+                                ...(latest.rescue_ids ?? []).filter(
+                                    (id: number) => !userRemovedSet.has(id),
+                                ),
+                                ...userAdded.filter(
+                                    (id) => !(latest.rescue_ids ?? []).includes(id),
+                                ),
+                            ];
+
+                            this.api
+                                .saveShiftAssignment({
+                                    date: this.getAssignmentDate(),
+                                    shift_id: this.getShiftId(),
+                                    rescue_ids: mergedIds,
+                                })
+                                .subscribe(() => {
+                                    this.assignedRescueIds.set(mergedIds);
+                                    outerContext.complete();
+                                });
                         });
                 },
             });
     }
 
-    protected readonly incidentTypes = ['แจ้งเหตุ', 'ปรึกษา', 'สายหลุด', 'ก่อกวน'] as const;
+    // ── Incident dialog ───────────────────────────────────────────────────────
+
+    protected readonly incidentTypes = ['แจ้งเหตุ', 'แจ้งเพิ่มเติม เหตุเดียวกัน', 'ปรึกษา', 'สายหลุด', 'ก่อกวน'] as const;
     protected readonly incidentSubtypes = ['1669', '2nd', 'วิทยุ'] as const;
-    protected readonly incidentLevels = ['Trauma', 'NonTrauma'] as const;
-    protected readonly incidentCbdLevels = ['แดง', 'เหลือง', 'เขียว', 'ขาว', 'ดำ'] as const;
+    protected readonly incidentLevels = [
+        {label: 'Trauma', value: 'trauma'},
+        {label: 'NonTrauma', value: 'non-trauma'},
+    ] as const;
+
+    private readonly rawCbdCriteria = toSignal(this.api.getCbdCriteria(), {initialValue: []});
+    private readonly rawCbdLevels = toSignal(this.api.getCbdLevel(), {initialValue: []});
+
+    protected readonly cbdCriteriaItems = computed(() =>
+        this.rawCbdCriteria().map((c) => c.cbdcriteria_detail),
+    );
+    protected readonly cbdLevelItems = computed(() =>
+        this.rawCbdLevels().map((l) => l.cbdlevel_detail),
+    );
 
     protected readonly recordIncidentForm = new FormGroup({
         type: new FormControl<string | null>(null, Validators.required),
         subtype: new FormControl<string | false>({value: false, disabled: true}, radioRequired),
         level: new FormControl<string | false>({value: false, disabled: true}, radioRequired),
-        cbd: new FormControl<string | false>({value: false, disabled: true}, radioRequired),
+        cbd_criteria: new FormControl<string | null>({value: null, disabled: true}, Validators.required),
+        cbd_level: new FormControl<string | null>({value: null, disabled: true}, Validators.required),
     });
 
     private readonly selectedIncidentType = toSignal(
@@ -422,13 +751,15 @@ export class App implements OnDestroy {
     protected onRecordIncidentClick(content: PolymorpheusContent): void {
         this.recordIncidentForm.reset();
         this.recordIncidentForm.markAsUntouched();
-        const {subtype, level, cbd} = this.recordIncidentForm.controls;
+        const {subtype, level, cbd_criteria, cbd_level} = this.recordIncidentForm.controls;
         subtype.reset(false);
         level.reset(false);
-        cbd.reset(false);
+        cbd_criteria.reset(null);
+        cbd_level.reset(null);
         subtype.disable();
         level.disable();
-        cbd.disable();
+        cbd_criteria.disable();
+        cbd_level.disable();
         this.confirm.markAsPristine();
 
         const sub = this.recordIncidentForm.valueChanges.subscribe(() =>
@@ -436,21 +767,25 @@ export class App implements OnDestroy {
         );
 
         const typeSub = this.recordIncidentForm.controls.type.valueChanges.subscribe((value) => {
-            const {subtype, level, cbd} = this.recordIncidentForm.controls;
+            const {subtype, level, cbd_criteria, cbd_level} = this.recordIncidentForm.controls;
             if (value === 'แจ้งเหตุ') {
                 subtype.enable();
                 subtype.markAsUntouched();
                 level.enable();
                 level.markAsUntouched();
-                cbd.enable();
-                cbd.markAsUntouched();
+                cbd_criteria.enable();
+                cbd_criteria.markAsUntouched();
+                cbd_level.enable();
+                cbd_level.markAsUntouched();
             } else {
                 subtype.reset(false);
                 level.reset(false);
-                cbd.reset(false);
+                cbd_criteria.reset(null);
+                cbd_level.reset(null);
                 subtype.disable();
                 level.disable();
-                cbd.disable();
+                cbd_criteria.disable();
+                cbd_level.disable();
             }
         });
 
@@ -460,7 +795,7 @@ export class App implements OnDestroy {
         });
 
         this.dialogs
-            .open(content, {label: 'บันทึกเหตุ', closable, dismissible: closable, size: 'm'})
+            .open(content, {label: 'บันทึกเหตุ', closable, dismissible: closable, size: 'l'})
             .subscribe({
                 complete: () => {
                     sub.unsubscribe();
@@ -493,13 +828,30 @@ export class App implements OnDestroy {
             })
             .subscribe({
                 next: (confirmed) => {
-                    if (confirmed) outerContext.complete();
+                    if (!confirmed) return;
+
+                    const {type, subtype, level, cbd_criteria, cbd_level} = this.recordIncidentForm.value;
+                    this.api
+                        .createIncident({
+                            date: this.getDateString(),
+                            shift_id: this.getShiftId(),
+                            type: type ?? '',
+                            subtype: (subtype as string | null) || null,
+                            level: (level as string | null) || null,
+                            cbd_criteria: cbd_criteria || null,
+                            cbd_level: cbd_level || null,
+                        })
+                        .subscribe(() => {
+                            this.loadSummary();
+                            outerContext.complete();
+                        });
                 },
             });
     }
 
     private isSameStaffSelection(a: StaffItem[], b: StaffItem[]): boolean {
         if (a.length !== b.length) return false;
-        return a.every((item) => b.includes(item));
+        const bIds = new Set(b.map((s) => s.rescue_id));
+        return a.every((item) => bIds.has(item.rescue_id));
     }
 }

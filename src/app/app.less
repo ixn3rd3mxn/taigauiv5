@@ -95,6 +95,22 @@
     margin-block-end: 0.25rem;
 }
 
+.invalid-group {
+    --tui-border-normal: var(--tui-status-negative);
+}
+
+[tuiAppearance][data-appearance=outline]:is([data-mode~=invalid], .tui-invalid, :invalid):not([data-mode~=readonly], [data-mode~=valid], [data-state=disabled], :disabled, ._disabled),
+[tuiAppearance][data-appearance=outline-destructive]:is([data-mode~=invalid], .tui-invalid, :invalid):not([data-mode~=readonly], [data-mode~=valid], [data-state=disabled], :disabled, ._disabled),
+[tuiAppearance][data-appearance=outline-grayscale]:is([data-mode~=invalid], .tui-invalid, :invalid):not([data-mode~=readonly], [data-mode~=valid], [data-state=disabled], :disabled, ._disabled) {
+    box-shadow: inset 0 0 0 1px var(--tui-status-negative);
+}
+
+.staff-table-wrapper {
+    border-radius: 0.75rem;
+    overflow: hidden;
+    box-shadow: var(--tui-shadow-medium);
+}
+
 .staff-viewport {
     block-size: 16.85rem;
 
@@ -117,8 +133,10 @@
     border-inline-end: none;
 }
 
-[tuiTh] {
+[tuiTh],
+[tuiTd] {
     border-block-start: none;
+    border-block-end: none;
 }
 
 [tuiTable][data-size='s'] [tuiTitle] {
