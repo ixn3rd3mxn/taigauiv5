@@ -44,7 +44,7 @@ export interface IncidentRecord {
     saved_at: string;
 }
 
-const API_URL = 'http://10.163.26.12:8000';
+const API_URL = 'http://10.163.26.6:8000';
 
 @Injectable({providedIn: 'root'})
 export class ApiService {
