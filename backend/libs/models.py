@@ -22,7 +22,3 @@ class Incident(BaseModel):
     cbd_level: Optional[str] = None
 
 
-class ShiftAssignment(BaseModel):
-    date: str  # YYYY-MM-DD
-    shift_id: int
-    rescue_ids: list[int]

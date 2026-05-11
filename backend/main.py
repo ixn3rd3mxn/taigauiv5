@@ -4,14 +4,12 @@ from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 from sse_starlette.sse import EventSourceResponse
 from libs.configs import (
-    rescue_collection,
     shiftwork_collection,
     incident_collection,
-    shift_assignment_collection,
     cbdcriteria_collection,
     cbdlevel_collection,
 )
-from libs.models import Incident, ShiftAssignment
+from libs.models import Incident
 
 _subscribers: set[asyncio.Queue] = set()
 
@@ -42,12 +40,6 @@ async def events():
         except asyncio.CancelledError:
             _subscribers.discard(q)
     return EventSourceResponse(stream())
-
-
-@app.get("/rescue")
-def get_rescue():
-    data = list(rescue_collection.find({}, {"_id": 0}))
-    return data
 
 
 @app.get("/cbdcriteria")
@@ -137,47 +129,3 @@ def get_incident_list(
     return incidents
 
 
-@app.post("/shift-assignment")
-async def set_shift_assignment(assignment: ShiftAssignment):
-    now = datetime.now()
-    saved_at = f"{now.hour:02d}:{now.minute:02d}:{now.second:02d}"
-
-    current = shift_assignment_collection.find_one(
-        {"date": assignment.date, "shift_id": assignment.shift_id}
-    )
-    current_ids = set(current.get("rescue_ids", []) if current else [])
-    new_ids = set(assignment.rescue_ids)
-    change_entry = {
-        "added": list(new_ids - current_ids),
-        "removed": list(current_ids - new_ids),
-        "saved_at": saved_at,
-    }
-
-    shift_assignment_collection.update_one(
-        {"date": assignment.date, "shift_id": assignment.shift_id},
-        {
-            "$set": {"rescue_ids": assignment.rescue_ids, "saved_at": saved_at},
-            "$push": {"changes": change_entry},
-        },
-        upsert=True,
-    )
-    await _broadcast("staff_updated")
-    return {"message": "ok", "saved_at": saved_at}
-
-
-@app.get("/shift-assignment")
-def get_shift_assignment(
-    date: str = Query(...),
-    shift_id: int = Query(...),
-):
-    result = shift_assignment_collection.find_one(
-        {"date": date, "shift_id": shift_id}, {"_id": 0}
-    )
-    # ดึก (3): ถ้ายังไม่มีการบันทึกแยก → ใช้รายชื่อจากบ่าย (2) เป็นค่าเริ่มต้น
-    if not result and shift_id == 3:
-        result = shift_assignment_collection.find_one(
-            {"date": date, "shift_id": 2}, {"_id": 0}
-        )
-    if not result:
-        return {"date": date, "shift_id": shift_id, "rescue_ids": []}
-    return result
