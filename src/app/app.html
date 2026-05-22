@@ -646,37 +646,6 @@
                     </footer>
                 </div>
 
-                <div
-                    appearance="floating"
-                    tuiCardLarge
-                    class="cbd-bar-chart-card"
-                >
-                    <header tuiHeader>
-                        <h1
-                            tuiTitle
-                            [style.font]="'var(--tui-typography-heading-h1)'"
-                        >
-                            <span tuiSubtitle>CBD 25 (ยังไม่เสร็จ)</span>
-                        </h1>
-                        <aside tuiAccessories>
-                            <div
-                                appearance="primary"
-                                tuiAvatar="@tui.bar-chart-2"
-                            ></div>
-                        </aside>
-                    </header>
-                    <tui-axes
-                        class="cbd-bar-chart"
-                        [axisXLabels]="cbdCriteriaLabelsX()"
-                        [axisYLabels]="cbdCriteriaLabelsY()"
-                    >
-                        <tui-bar-chart
-                            [max]="cbdCriteriaChartMax()"
-                            [value]="cbdCriteriaChartValue()"
-                        />
-                    </tui-axes>
-                </div>
-
             </div>
         </main>
     </div>

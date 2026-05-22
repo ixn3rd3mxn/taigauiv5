@@ -28,11 +28,6 @@ export interface CbdLevel {
     cbdlevel_detail: string;
 }
 
-export interface CbdSummary {
-    by_criteria: Record<string, number>;
-    by_level: Record<string, number>;
-}
-
 export interface IncidentRecord {
     date: string;
     shift_id: number;
@@ -44,7 +39,7 @@ export interface IncidentRecord {
     saved_at: string;
 }
 
-const API_URL = 'http://10.163.26.6:8000';
+const API_URL = 'http://localhost:8000';
 
 @Injectable({providedIn: 'root'})
 export class ApiService {
@@ -69,11 +64,6 @@ export class ApiService {
             this.getIncidentSummary(date, 2),
             this.getIncidentSummary(date, 3),
         ]).pipe(map(([s1, s2, s3]) => [s3.total, s1.total, s2.total]));
-    }
-
-    getCbdSummary(date: string, shiftId: number): Observable<CbdSummary> {
-        const params = new HttpParams().set('date', date).set('shift_id', shiftId);
-        return this.http.get<CbdSummary>(`${API_URL}/incident/cbd-summary`, {params});
     }
 
     getIncidentList(date: string, shiftId: number): Observable<IncidentRecord[]> {
